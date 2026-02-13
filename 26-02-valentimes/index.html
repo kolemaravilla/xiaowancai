@@ -50,8 +50,8 @@ body{font-family:'Great Vibes',cursive;background:#1a0008;display:flex;align-ite
 @keyframes textGlitter{0%{background-position:0% 50%}100%{background-position:400% 50%}}
 
 /* ===== NAMES TEXT ===== */
-#namesText{position:absolute;top:50%;left:50%;transform:translate(-50%,-52%);text-align:center;font-family:'Great Vibes',cursive;font-size:clamp(2.8rem,12vw,4rem);line-height:1.1;z-index:32;display:none;opacity:0;transition:opacity 0.8s ease;max-width:68%;background:linear-gradient(90deg,#ff7eb3,#ffd700,#ff69b4,#ffffff,#ff7eb3,#ffd700);background-size:400% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:textGlitter 4s linear infinite}
-#namesText.show{display:block;opacity:1}
+#namesText{position:absolute;top:50%;left:50%;transform:translate(-50%,-52%);text-align:center;font-family:'Great Vibes',cursive;font-size:clamp(2.8rem,12vw,4rem);line-height:1.1;z-index:32;opacity:0;pointer-events:none;transition:opacity 0.8s ease;max-width:68%;background:linear-gradient(90deg,#ff7eb3,#ffd700,#ff69b4,#ffffff,#ff7eb3,#ffd700);background-size:400% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:textGlitter 4s linear infinite}
+#namesText.show{opacity:1;pointer-events:auto}
 #namesText .plus{font-size:0.55em}
 
 /* ===== TEXT SPARKLES ===== */
@@ -100,7 +100,7 @@ body{font-family:'Great Vibes',cursive;background:#1a0008;display:flex;align-ite
 
 <div id="heartContainer">
   <div id="questionText">Will you be<br>my Valentine?</div>
-  <div id="namesText">Hannah<br><span class="plus">+</span><br>Kole</div>
+  <div id="namesText">HANNAH<br><span class="plus">+</span><br>KOLE</div>
   <div id="buttonsContainer">
     <button class="btn" id="yesBtn">Yes</button>
     <button class="btn" id="noBtn">No</button>
@@ -303,8 +303,16 @@ function playGrumble(){
   }catch(e){}
 }
 
-noBtn.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();dodgeNoBtn()},{passive:false});
-noBtn.addEventListener('touchstart',e=>{e.preventDefault()},{passive:false});
+let lastDodge=0;
+function handleNoDodge(e){
+  e.preventDefault();
+  const now=Date.now();
+  if(now-lastDodge<200)return;
+  lastDodge=now;
+  dodgeNoBtn();
+}
+noBtn.addEventListener('touchstart',handleNoDodge,{passive:false});
+noBtn.addEventListener('pointerdown',handleNoDodge,{passive:false});
 
 /* ==========================================
    YES → CELEBRATION
@@ -324,7 +332,7 @@ function startCelebration(){
   document.querySelectorAll('.text-sparkle').forEach(el=>el.remove());
   const hc=document.getElementById('heartContainer');
   hc.style.opacity='1';
-  hc.classList.add('celebrate');
+  hc.style.filter='drop-shadow(0 0 20px rgba(255,100,150,0.4))';
   const names=document.getElementById('namesText');
   names.classList.add('show');
   setTimeout(()=>addSparklesFor(names),400);
