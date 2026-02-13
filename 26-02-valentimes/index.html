@@ -46,11 +46,11 @@ body{font-family:'Great Vibes',cursive;background:#3a1a28;display:flex;align-ite
 @keyframes flowerSway{0%{transform:rotate(calc(var(--rot,0deg) - 6deg)) scale(0.93)}100%{transform:rotate(calc(var(--rot,0deg) + 6deg)) scale(1.07)}}
 
 /* ===== QUESTION TEXT ===== */
-#questionText{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);text-align:center;font-family:'Great Vibes',cursive;font-weight:bold;font-size:clamp(1.8rem,7vw,2.6rem);line-height:1.35;z-index:32;background:linear-gradient(90deg,#9B0E2B,#4A0878,#7D1818,#2D3A8E,#9B0E2B,#4A0878,#7D1818);background-size:400% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.7));animation:textGlitter 30s linear infinite;max-width:70%;transition:opacity 0.4s ease}
+#questionText{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);text-align:center;font-family:'Great Vibes',cursive;font-weight:bold;font-size:clamp(1.8rem,7vw,2.6rem);line-height:1.35;z-index:32;background:linear-gradient(90deg,#9B0E2B,#4A0878,#7D1818,#2D3A8E,#9B0E2B,#4A0878,#7D1818);background-size:400% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;-webkit-text-stroke:0.4px rgba(255,215,0,0.5);filter:drop-shadow(0 2px 4px rgba(0,0,0,0.7));animation:textGlitter 30s linear infinite;max-width:70%;transition:opacity 0.4s ease}
 @keyframes textGlitter{0%{background-position:0% 50%}100%{background-position:400% 50%}}
 
 /* ===== NAMES TEXT ===== */
-#namesText{position:absolute;top:50%;left:50%;transform:translate(-50%,-52%);text-align:center;font-family:'Great Vibes',cursive;font-weight:bold;font-size:clamp(2rem,7vw,2.6rem);line-height:1.25;z-index:32;opacity:0;pointer-events:none;transition:opacity 0.8s ease;max-width:80%;background:linear-gradient(90deg,#9B0E2B,#4A0878,#7D1818,#2D3A8E,#9B0E2B,#4A0878,#7D1818);background-size:400% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.7));animation:textGlitter 30s linear infinite}
+#namesText{position:absolute;top:50%;left:50%;transform:translate(-50%,-52%);text-align:center;font-family:'Great Vibes',cursive;font-weight:bold;font-size:clamp(2rem,7vw,2.6rem);line-height:1.25;z-index:32;opacity:0;pointer-events:none;transition:opacity 0.8s ease;max-width:80%;background:linear-gradient(90deg,#9B0E2B,#4A0878,#7D1818,#2D3A8E,#9B0E2B,#4A0878,#7D1818);background-size:400% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;-webkit-text-stroke:0.4px rgba(255,215,0,0.5);filter:drop-shadow(0 2px 4px rgba(0,0,0,0.7));animation:textGlitter 30s linear infinite}
 #namesText.show{opacity:1;pointer-events:auto}
 #namesText .plus{font-size:0.85em}
 
@@ -113,11 +113,11 @@ body{font-family:'Great Vibes',cursive;background:#3a1a28;display:flex;align-ite
    DATA
    ========================================== */
 const PHOTOS = [
-  'IMG_0235_Medium.jpeg','IMG_0431_Medium.jpeg','IMG_0489_Medium.jpeg',
+  'IMG_0235_Medium.jpeg','IMG_0489_Medium.jpeg',
   'IMG_0594_Medium.jpeg','IMG_1170_Medium.jpeg','IMG_1218_Medium.jpeg',
   'IMG_1220_Medium.jpeg','IMG_1247_Medium.jpeg','IMG_1252_Medium.jpeg',
   'IMG_1254_Medium.jpeg','IMG_1262_Medium.jpeg','IMG_1537_Medium.jpeg',
-  'IMG_1629_Medium.jpeg','IMG_1902_Medium.jpeg','IMG_8695_Medium.jpeg',
+  'IMG_1902_Medium.jpeg','IMG_8695_Medium.jpeg',
   'IMG_8715_Medium.jpeg','IMG_9079_Medium.jpeg','IMG_9175_Medium.jpeg',
   'IMG_9228_Medium.jpeg','IMG_9458_Medium.jpeg','IMG_9558_Medium.jpeg',
   'IMG_9599_Medium.jpeg','IMG_9966_Medium.jpeg',
@@ -130,7 +130,8 @@ const PHOTOS = [
 const FLOWER_POOL = [
   {e:'\u{1F338}',w:6},{e:'\u{1F33A}',w:4},{e:'\u{1F339}',w:5},{e:'\u{1F337}',w:4},
   {e:'\u{1FAB7}',w:3},{e:'\u{1F4AE}',w:2},{e:'\u{1FAB7}',w:2},{e:'\u{1F33C}',w:1},
-  {e:'\u{1F33F}',w:1},{e:'\u{1F343}',w:1}
+  {e:'\u{1F33F}',w:1},{e:'\u{1F343}',w:1},
+  {e:'\u{1F48E}',w:2},{e:'\u{1FA99}',w:2}
 ];
 const CELEBRATION_EMOJIS = ['\u2764\uFE0F','\u{1F495}','\u{1F49D}','\u{1F496}','\u{1F339}','\u{1F490}','\u{1F338}','\u{1F36B}','\u{1F9E7}','\u{1F63B}','\u{1F497}','\u{1FAF6}'];
 
