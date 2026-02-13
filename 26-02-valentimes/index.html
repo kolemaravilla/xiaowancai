@@ -46,11 +46,11 @@ body{font-family:'Great Vibes',cursive;background:#1a0008;display:flex;align-ite
 @keyframes flowerSway{0%{transform:rotate(calc(var(--rot,0deg) - 6deg)) scale(0.93)}100%{transform:rotate(calc(var(--rot,0deg) + 6deg)) scale(1.07)}}
 
 /* ===== QUESTION TEXT ===== */
-#questionText{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);text-align:center;font-family:'Great Vibes',cursive;font-size:clamp(1.8rem,7vw,2.6rem);line-height:1.35;z-index:32;background:linear-gradient(90deg,#DC143C,#6A0DAD,#B22222,#4169E1,#DC143C,#6A0DAD,#B22222);background-size:400% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:textGlitter 4s linear infinite;max-width:70%;transition:opacity 0.4s ease}
+#questionText{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);text-align:center;font-family:'Great Vibes',cursive;font-weight:bold;font-size:clamp(1.8rem,7vw,2.6rem);line-height:1.35;z-index:32;background:linear-gradient(90deg,#DC143C,#6A0DAD,#B22222,#4169E1,#DC143C,#6A0DAD,#B22222);background-size:400% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.7));animation:textGlitter 30s linear infinite;max-width:70%;transition:opacity 0.4s ease}
 @keyframes textGlitter{0%{background-position:0% 50%}100%{background-position:400% 50%}}
 
 /* ===== NAMES TEXT ===== */
-#namesText{position:absolute;top:50%;left:50%;transform:translate(-50%,-52%);text-align:center;font-family:'Great Vibes',cursive;font-size:clamp(2rem,7vw,2.6rem);line-height:1.25;z-index:32;opacity:0;pointer-events:none;transition:opacity 0.8s ease;max-width:80%;background:linear-gradient(90deg,#DC143C,#6A0DAD,#B22222,#4169E1,#DC143C,#6A0DAD,#B22222);background-size:400% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:textGlitter 4s linear infinite}
+#namesText{position:absolute;top:50%;left:50%;transform:translate(-50%,-52%);text-align:center;font-family:'Great Vibes',cursive;font-weight:bold;font-size:clamp(2rem,7vw,2.6rem);line-height:1.25;z-index:32;opacity:0;pointer-events:none;transition:opacity 0.8s ease;max-width:80%;background:linear-gradient(90deg,#DC143C,#6A0DAD,#B22222,#4169E1,#DC143C,#6A0DAD,#B22222);background-size:400% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.7));animation:textGlitter 30s linear infinite}
 #namesText.show{opacity:1;pointer-events:auto}
 #namesText .plus{font-size:0.55em}
 
@@ -79,10 +79,8 @@ body{font-family:'Great Vibes',cursive;background:#1a0008;display:flex;align-ite
 @keyframes emojifall{0%{transform:translateY(0) rotate(0deg);opacity:1}85%{opacity:1}100%{transform:translateY(calc(100dvh + 80px)) rotate(var(--spin,360deg));opacity:0}}
 
 /* ===== PHOTO ELEMENTS ===== */
-.photo-el{position:fixed;z-index:50;pointer-events:none;border:4px solid white;border-bottom-width:18px;border-radius:2px;box-shadow:0 6px 25px rgba(0,0,0,0.4);overflow:hidden;will-change:transform,opacity;opacity:0;animation:photoPop 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards}
-@keyframes photoPop{0%{transform:scale(0) rotate(0deg);opacity:0}100%{transform:scale(1) rotate(var(--rot,0deg));opacity:1}}
-@keyframes photoFadeOut{from{opacity:1}to{opacity:0;transform:scale(0.85) rotate(var(--rot,0deg))}}
-.photo-el.fade-out{animation:photoFadeOut 0.8s ease forwards!important}
+.photo-el{position:fixed;z-index:50;pointer-events:none;border:4px solid white;border-bottom-width:18px;border-radius:2px;box-shadow:0 6px 25px rgba(0,0,0,0.4);overflow:hidden;will-change:transform,opacity;animation:photoGlide var(--dur,6s) linear forwards}
+@keyframes photoGlide{0%{transform:translate(0,0) rotate(var(--rot,0deg));opacity:0}8%{opacity:1}85%{opacity:1}100%{transform:translate(var(--tx,0px),var(--ty,0px)) rotate(var(--rot,0deg));opacity:0}}
 .photo-el img{width:100%;height:100%;object-fit:cover;display:block}
 </style>
 </head>
@@ -243,6 +241,9 @@ const duduPopup=document.getElementById('duduPopup');
 let noDodging=false,duduTimer=null;
 
 function dodgeNoBtn(){
+  const prevX=parseFloat(noBtn.style.left);
+  const prevY=parseFloat(noBtn.style.top);
+  const hasPrev=!isNaN(prevX);
   if(!noDodging){
     noDodging=true;
     document.body.appendChild(noBtn);
@@ -252,6 +253,10 @@ function dodgeNoBtn(){
   }
   const bw=noBtn.offsetWidth,bh=noBtn.offsetHeight;
   const yR=yesBtn.getBoundingClientRect();
+  const dW=Math.min(window.innerWidth*0.4,180);
+  const dCx=window.innerWidth/2,dCy=window.innerHeight/2;
+  const dR={left:dCx-dW/2-20,right:dCx+dW/2+20,top:dCy-dW/2-20,bottom:dCy+dW/2+20};
+  const minDist=150;
   const pad=15;
   let x,y,att=0;
   do{
@@ -259,8 +264,11 @@ function dodgeNoBtn(){
     y=pad+Math.random()*(window.innerHeight-bh-pad*2);
     att++;
     const nR={left:x,right:x+bw,top:y,bottom:y+bh};
-    const overlap=!(nR.right+20<yR.left||nR.left-20>yR.right||nR.bottom+20<yR.top||nR.top-20>yR.bottom);
-    if(!overlap)break;
+    const hitYes=!(nR.right+20<yR.left||nR.left-20>yR.right||nR.bottom+20<yR.top||nR.top-20>yR.bottom);
+    const hitDudu=!(nR.right<dR.left||nR.left>dR.right||nR.bottom<dR.top||nR.top>dR.bottom);
+    const dx=x-prevX,dy=y-prevY;
+    const farEnough=!hasPrev||Math.sqrt(dx*dx+dy*dy)>=minDist;
+    if(!hitYes&&!hitDudu&&farEnough)break;
   }while(att<80);
   noBtn.style.left=x+'px';
   noBtn.style.top=y+'px';
@@ -453,18 +461,23 @@ function spawnPhoto(){
   el.className='photo-el';
   const size=95+Math.random()*45;
   const rot=(Math.random()-0.5)*30;
-  const x=15+Math.random()*(window.innerWidth-size-50);
-  const y=30+Math.random()*(window.innerHeight-size-80);
-  el.style.cssText='left:'+x+'px;top:'+y+'px;width:'+size+'px;height:'+size+'px;--rot:'+rot+'deg';
+  const x=-size/2+Math.random()*window.innerWidth;
+  const y=-size/2+Math.random()*window.innerHeight;
+  const angle=Math.random()*Math.PI*2;
+  const dist=150+Math.random()*200;
+  const tx=Math.cos(angle)*dist;
+  const ty=Math.sin(angle)*dist;
+  const dur=5+Math.random()*3;
+  el.style.cssText='left:'+x+'px;top:'+y+'px;width:'+size+'px;height:'+size+'px;--rot:'+rot+'deg;--tx:'+tx+'px;--ty:'+ty+'px;--dur:'+dur+'s';
   const img=document.createElement('img');img.src=src;img.alt='';
   el.appendChild(img);document.body.appendChild(el);
-  setTimeout(()=>{el.classList.add('fade-out');setTimeout(()=>el.remove(),900)},3000+Math.random()*1500);
+  setTimeout(()=>el.remove(),dur*1000+100);
 }
 
 function startPhotoSpray(){
   shuffled=shuffle([...PHOTOS]);photoIdx=0;
-  for(let i=0;i<4;i++)setTimeout(()=>spawnPhoto(),i*200);
-  setInterval(spawnPhoto,700);
+  for(let i=0;i<3;i++)setTimeout(()=>spawnPhoto(),i*300);
+  setInterval(spawnPhoto,1200);
 }
 
 /* ==========================================
