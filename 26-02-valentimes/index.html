@@ -3,24 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#1a0008">
+<meta name="theme-color" content="#3a1a28">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>For You</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>😻</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100dvh;overflow:hidden;touch-action:manipulation;-webkit-user-select:none;user-select:none}
-body{font-family:'Great Vibes',cursive;background:#1a0008;display:flex;align-items:center;justify-content:center;position:relative}
+body{font-family:'Great Vibes',cursive;background:#3a1a28;display:flex;align-items:center;justify-content:center;position:relative}
 
 /* ===== BACKGROUND LAYERS ===== */
-.bg-base{position:fixed;inset:0;background:radial-gradient(ellipse at 30% 25%,#6b0f2e 0%,transparent 60%),radial-gradient(ellipse at 70% 75%,#4a0a20 0%,transparent 60%),radial-gradient(ellipse at 50% 50%,#3d0919 0%,#1a0008 100%);z-index:0}
+.bg-base{position:fixed;inset:0;background:radial-gradient(ellipse at 30% 25%,#b05575 0%,transparent 60%),radial-gradient(ellipse at 70% 75%,#8c4060 0%,transparent 60%),radial-gradient(ellipse at 50% 50%,#6d3048 0%,#3a1a28 100%);z-index:0}
 .bg-silk{position:fixed;inset:0;background:repeating-linear-gradient(110deg,transparent 0px,rgba(255,180,200,0.015) 2px,transparent 4px),repeating-linear-gradient(70deg,transparent 0px,rgba(255,120,160,0.01) 3px,transparent 6px);z-index:1}
 .bg-shimmer{position:fixed;inset:0;background:linear-gradient(115deg,transparent 20%,rgba(255,200,220,0.06) 40%,rgba(255,180,200,0.1) 50%,rgba(255,200,220,0.06) 60%,transparent 80%);background-size:200% 100%;animation:shimmerMove 6s ease-in-out infinite;z-index:2;pointer-events:none}
 @keyframes shimmerMove{0%{background-position:200% 0}100%{background-position:-200% 0}}
-.bg-vignette{position:fixed;inset:0;background:radial-gradient(ellipse at center,transparent 50%,rgba(10,0,4,0.6) 100%);z-index:3;pointer-events:none}
+.bg-vignette{position:fixed;inset:0;background:radial-gradient(ellipse at center,transparent 50%,rgba(30,12,20,0.5) 100%);z-index:3;pointer-events:none}
 
 /* ===== AMBIENT SPARKLES ===== */
 .ambient-sparkle{position:fixed;width:3px;height:3px;background:radial-gradient(circle,rgba(255,215,0,0.9),transparent);border-radius:50%;pointer-events:none;z-index:4;animation:ambientTwinkle var(--dur) ease-in-out infinite;animation-delay:var(--del)}
@@ -46,13 +47,13 @@ body{font-family:'Great Vibes',cursive;background:#1a0008;display:flex;align-ite
 @keyframes flowerSway{0%{transform:rotate(calc(var(--rot,0deg) - 6deg)) scale(0.93)}100%{transform:rotate(calc(var(--rot,0deg) + 6deg)) scale(1.07)}}
 
 /* ===== QUESTION TEXT ===== */
-#questionText{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);text-align:center;font-family:'Great Vibes',cursive;font-size:clamp(1.8rem,7vw,2.6rem);line-height:1.35;z-index:32;background:linear-gradient(90deg,#ff7eb3,#ffd700,#ff69b4,#ffffff,#ff7eb3,#ffd700,#ff69b4);background-size:400% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:textGlitter 4s linear infinite;max-width:70%;transition:opacity 0.4s ease}
+#questionText{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);text-align:center;font-family:'Great Vibes',cursive;font-weight:bold;font-size:clamp(1.8rem,7vw,2.6rem);line-height:1.35;z-index:32;background:linear-gradient(90deg,#9B0E2B,#4A0878,#7D1818,#2D3A8E,#9B0E2B,#4A0878,#7D1818);background-size:400% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;-webkit-text-stroke:0.4px rgba(255,215,0,0.5);filter:drop-shadow(0 2px 4px rgba(0,0,0,0.7));animation:textGlitter 30s linear infinite;max-width:70%;transition:opacity 0.4s ease}
 @keyframes textGlitter{0%{background-position:0% 50%}100%{background-position:400% 50%}}
 
 /* ===== NAMES TEXT ===== */
-#namesText{position:absolute;top:50%;left:50%;transform:translate(-50%,-52%);text-align:center;font-family:'Great Vibes',cursive;font-size:clamp(2.8rem,12vw,4rem);line-height:1.1;z-index:32;display:none;opacity:0;transition:opacity 0.8s ease;max-width:68%;background:linear-gradient(90deg,#ff7eb3,#ffd700,#ff69b4,#ffffff,#ff7eb3,#ffd700);background-size:400% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:textGlitter 4s linear infinite}
-#namesText.show{display:block;opacity:1}
-#namesText .plus{font-size:0.55em}
+#namesText{position:absolute;top:50%;left:50%;transform:translate(-50%,-52%);text-align:center;font-family:'Great Vibes',cursive;font-weight:bold;font-size:clamp(2rem,7vw,2.6rem);line-height:1.25;z-index:32;opacity:0;pointer-events:none;transition:opacity 0.8s ease;max-width:80%;background:linear-gradient(90deg,#9B0E2B,#4A0878,#7D1818,#2D3A8E,#9B0E2B,#4A0878,#7D1818);background-size:400% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;-webkit-text-stroke:0.4px rgba(255,215,0,0.5);filter:drop-shadow(0 2px 4px rgba(0,0,0,0.7));animation:textGlitter 30s linear infinite}
+#namesText.show{opacity:1;pointer-events:auto}
+#namesText .plus{font-size:0.85em}
 
 /* ===== TEXT SPARKLES ===== */
 .text-sparkle{position:absolute;width:var(--s,3px);height:var(--s,3px);background:radial-gradient(circle,#ffd700,transparent);border-radius:50%;pointer-events:none;z-index:33;animation:textSpark var(--dur,2s) ease-in-out infinite;animation-delay:var(--del,0s)}
@@ -72,17 +73,15 @@ body{font-family:'Great Vibes',cursive;background:#1a0008;display:flex;align-ite
 @keyframes duduShake{0%,100%{transform:rotate(0)}20%{transform:rotate(-12deg)}40%{transform:rotate(10deg)}60%{transform:rotate(-8deg)}80%{transform:rotate(6deg)}}
 
 /* ===== FIREWORKS CANVAS ===== */
-#fireworksCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:60;pointer-events:none}
+#fireworksCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:40;pointer-events:none}
 
 /* ===== FALLING EMOJIS ===== */
-.falling-emoji{position:fixed;top:-60px;z-index:50;pointer-events:none;will-change:transform;animation:emojifall var(--dur,5s) linear forwards}
+.falling-emoji{position:fixed;top:-60px;z-index:60;pointer-events:none;will-change:transform;animation:emojifall var(--dur,5s) linear forwards}
 @keyframes emojifall{0%{transform:translateY(0) rotate(0deg);opacity:1}85%{opacity:1}100%{transform:translateY(calc(100dvh + 80px)) rotate(var(--spin,360deg));opacity:0}}
 
 /* ===== PHOTO ELEMENTS ===== */
-.photo-el{position:fixed;z-index:20;pointer-events:none;border:4px solid white;border-bottom-width:18px;border-radius:2px;box-shadow:0 6px 25px rgba(0,0,0,0.4);overflow:hidden;will-change:transform,opacity;opacity:0;animation:photoPop 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards}
-@keyframes photoPop{0%{transform:scale(0) rotate(0deg);opacity:0}100%{transform:scale(1) rotate(var(--rot,0deg));opacity:1}}
-@keyframes photoFadeOut{from{opacity:1}to{opacity:0;transform:scale(0.85) rotate(var(--rot,0deg))}}
-.photo-el.fade-out{animation:photoFadeOut 0.8s ease forwards!important}
+.photo-el{position:fixed;z-index:50;pointer-events:none;border:4px solid white;border-bottom-width:18px;border-radius:2px;box-shadow:0 6px 25px rgba(0,0,0,0.4);overflow:hidden;will-change:transform,opacity;animation:photoGlide var(--dur,6s) linear forwards}
+@keyframes photoGlide{0%{transform:translate(0,0) rotate(var(--rot,0deg));opacity:0}8%{opacity:1}85%{opacity:1}100%{transform:translate(var(--tx,0px),var(--ty,0px)) rotate(var(--rot,0deg));opacity:0}}
 .photo-el img{width:100%;height:100%;object-fit:cover;display:block}
 </style>
 </head>
@@ -115,11 +114,11 @@ body{font-family:'Great Vibes',cursive;background:#1a0008;display:flex;align-ite
    DATA
    ========================================== */
 const PHOTOS = [
-  'IMG_0235_Medium.jpeg','IMG_0431_Medium.jpeg','IMG_0489_Medium.jpeg',
+  'IMG_0235_Medium.jpeg','IMG_0489_Medium.jpeg',
   'IMG_0594_Medium.jpeg','IMG_1170_Medium.jpeg','IMG_1218_Medium.jpeg',
   'IMG_1220_Medium.jpeg','IMG_1247_Medium.jpeg','IMG_1252_Medium.jpeg',
   'IMG_1254_Medium.jpeg','IMG_1262_Medium.jpeg','IMG_1537_Medium.jpeg',
-  'IMG_1629_Medium.jpeg','IMG_1902_Medium.jpeg','IMG_8695_Medium.jpeg',
+  'IMG_1902_Medium.jpeg','IMG_8695_Medium.jpeg',
   'IMG_8715_Medium.jpeg','IMG_9079_Medium.jpeg','IMG_9175_Medium.jpeg',
   'IMG_9228_Medium.jpeg','IMG_9458_Medium.jpeg','IMG_9558_Medium.jpeg',
   'IMG_9599_Medium.jpeg','IMG_9966_Medium.jpeg',
@@ -132,7 +131,8 @@ const PHOTOS = [
 const FLOWER_POOL = [
   {e:'\u{1F338}',w:6},{e:'\u{1F33A}',w:4},{e:'\u{1F339}',w:5},{e:'\u{1F337}',w:4},
   {e:'\u{1FAB7}',w:3},{e:'\u{1F4AE}',w:2},{e:'\u{1FAB7}',w:2},{e:'\u{1F33C}',w:1},
-  {e:'\u{1F33F}',w:1},{e:'\u{1F343}',w:1}
+  {e:'\u{1F33F}',w:1},{e:'\u{1F343}',w:1},
+  {e:'\u{1F48E}',w:2},{e:'\u{1FA99}',w:2}
 ];
 const CELEBRATION_EMOJIS = ['\u2764\uFE0F','\u{1F495}','\u{1F49D}','\u{1F496}','\u{1F339}','\u{1F490}','\u{1F338}','\u{1F36B}','\u{1F9E7}','\u{1F63B}','\u{1F497}','\u{1FAF6}'];
 
@@ -243,6 +243,9 @@ const duduPopup=document.getElementById('duduPopup');
 let noDodging=false,duduTimer=null;
 
 function dodgeNoBtn(){
+  const prevX=parseFloat(noBtn.style.left);
+  const prevY=parseFloat(noBtn.style.top);
+  const hasPrev=!isNaN(prevX);
   if(!noDodging){
     noDodging=true;
     document.body.appendChild(noBtn);
@@ -252,6 +255,10 @@ function dodgeNoBtn(){
   }
   const bw=noBtn.offsetWidth,bh=noBtn.offsetHeight;
   const yR=yesBtn.getBoundingClientRect();
+  const dW=Math.min(window.innerWidth*0.4,180);
+  const dCx=window.innerWidth/2,dCy=window.innerHeight/2;
+  const dR={left:dCx-dW/2-20,right:dCx+dW/2+20,top:dCy-dW/2-20,bottom:dCy+dW/2+20};
+  const minDist=150;
   const pad=15;
   let x,y,att=0;
   do{
@@ -259,8 +266,11 @@ function dodgeNoBtn(){
     y=pad+Math.random()*(window.innerHeight-bh-pad*2);
     att++;
     const nR={left:x,right:x+bw,top:y,bottom:y+bh};
-    const overlap=!(nR.right+20<yR.left||nR.left-20>yR.right||nR.bottom+20<yR.top||nR.top-20>yR.bottom);
-    if(!overlap)break;
+    const hitYes=!(nR.right+20<yR.left||nR.left-20>yR.right||nR.bottom+20<yR.top||nR.top-20>yR.bottom);
+    const hitDudu=!(nR.right<dR.left||nR.left>dR.right||nR.bottom<dR.top||nR.top>dR.bottom);
+    const dx=x-prevX,dy=y-prevY;
+    const farEnough=!hasPrev||Math.sqrt(dx*dx+dy*dy)>=minDist;
+    if(!hitYes&&!hitDudu&&farEnough)break;
   }while(att<80);
   noBtn.style.left=x+'px';
   noBtn.style.top=y+'px';
@@ -303,8 +313,16 @@ function playGrumble(){
   }catch(e){}
 }
 
-noBtn.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();dodgeNoBtn()},{passive:false});
-noBtn.addEventListener('touchstart',e=>{e.preventDefault()},{passive:false});
+let lastDodge=0;
+function handleNoDodge(e){
+  e.preventDefault();
+  const now=Date.now();
+  if(now-lastDodge<200)return;
+  lastDodge=now;
+  dodgeNoBtn();
+}
+noBtn.addEventListener('touchstart',handleNoDodge,{passive:false});
+noBtn.addEventListener('pointerdown',handleNoDodge,{passive:false});
 
 /* ==========================================
    YES → CELEBRATION
@@ -324,7 +342,7 @@ function startCelebration(){
   document.querySelectorAll('.text-sparkle').forEach(el=>el.remove());
   const hc=document.getElementById('heartContainer');
   hc.style.opacity='1';
-  hc.classList.add('celebrate');
+  hc.style.filter='drop-shadow(0 0 20px rgba(255,100,150,0.4))';
   const names=document.getElementById('namesText');
   names.classList.add('show');
   setTimeout(()=>addSparklesFor(names),400);
@@ -445,18 +463,23 @@ function spawnPhoto(){
   el.className='photo-el';
   const size=95+Math.random()*45;
   const rot=(Math.random()-0.5)*30;
-  const x=15+Math.random()*(window.innerWidth-size-50);
-  const y=30+Math.random()*(window.innerHeight-size-80);
-  el.style.cssText='left:'+x+'px;top:'+y+'px;width:'+size+'px;height:'+size+'px;--rot:'+rot+'deg';
+  const x=-size/2+Math.random()*window.innerWidth;
+  const y=-size/2+Math.random()*window.innerHeight;
+  const angle=Math.random()*Math.PI*2;
+  const dist=150+Math.random()*200;
+  const tx=Math.cos(angle)*dist;
+  const ty=Math.sin(angle)*dist;
+  const dur=5+Math.random()*3;
+  el.style.cssText='left:'+x+'px;top:'+y+'px;width:'+size+'px;height:'+size+'px;--rot:'+rot+'deg;--tx:'+tx+'px;--ty:'+ty+'px;--dur:'+dur+'s';
   const img=document.createElement('img');img.src=src;img.alt='';
   el.appendChild(img);document.body.appendChild(el);
-  setTimeout(()=>{el.classList.add('fade-out');setTimeout(()=>el.remove(),900)},3000+Math.random()*1500);
+  setTimeout(()=>el.remove(),dur*1000+100);
 }
 
 function startPhotoSpray(){
   shuffled=shuffle([...PHOTOS]);photoIdx=0;
-  for(let i=0;i<4;i++)setTimeout(()=>spawnPhoto(),i*200);
-  setInterval(spawnPhoto,700);
+  for(let i=0;i<3;i++)setTimeout(()=>spawnPhoto(),i*300);
+  setInterval(spawnPhoto,1200);
 }
 
 /* ==========================================
