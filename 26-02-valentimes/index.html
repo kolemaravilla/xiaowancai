@@ -82,7 +82,7 @@ body{font-family:'Great Vibes',cursive;background:#1a0008;display:flex;align-ite
 .photo-el{position:fixed;z-index:20;pointer-events:none;border:4px solid white;border-bottom-width:18px;border-radius:2px;box-shadow:0 6px 25px rgba(0,0,0,0.4);overflow:hidden;will-change:transform,opacity;opacity:0;animation:photoPop 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards}
 @keyframes photoPop{0%{transform:scale(0) rotate(0deg);opacity:0}100%{transform:scale(1) rotate(var(--rot,0deg));opacity:1}}
 @keyframes photoFadeOut{from{opacity:1}to{opacity:0;transform:scale(0.85) rotate(var(--rot,0deg))}}
-.photo-el.fade-out{animation:photoFadeOut 1.5s ease forwards!important}
+.photo-el.fade-out{animation:photoFadeOut 0.8s ease forwards!important}
 .photo-el img{width:100%;height:100%;object-fit:cover;display:block}
 </style>
 </head>
@@ -245,6 +245,7 @@ let noDodging=false,duduTimer=null;
 function dodgeNoBtn(){
   if(!noDodging){
     noDodging=true;
+    document.body.appendChild(noBtn);
     noBtn.style.position='fixed';
     noBtn.style.zIndex='35';
     noBtn.style.margin='0';
@@ -321,9 +322,11 @@ function startCelebration(){
   if(noDodging)noBtn.style.display='none';
   document.getElementById('questionText').style.display='none';
   document.querySelectorAll('.text-sparkle').forEach(el=>el.remove());
+  const hc=document.getElementById('heartContainer');
+  hc.style.opacity='1';
+  hc.classList.add('celebrate');
   const names=document.getElementById('namesText');
   names.classList.add('show');
-  document.getElementById('heartContainer').classList.add('celebrate');
   setTimeout(()=>addSparklesFor(names),400);
   startFireworks();
   startFallingEmojis();
@@ -447,13 +450,13 @@ function spawnPhoto(){
   el.style.cssText='left:'+x+'px;top:'+y+'px;width:'+size+'px;height:'+size+'px;--rot:'+rot+'deg';
   const img=document.createElement('img');img.src=src;img.alt='';
   el.appendChild(img);document.body.appendChild(el);
-  setTimeout(()=>{el.classList.add('fade-out');setTimeout(()=>el.remove(),1600)},9000+Math.random()*4000);
+  setTimeout(()=>{el.classList.add('fade-out');setTimeout(()=>el.remove(),900)},3000+Math.random()*1500);
 }
 
 function startPhotoSpray(){
   shuffled=shuffle([...PHOTOS]);photoIdx=0;
-  for(let i=0;i<4;i++)setTimeout(()=>spawnPhoto(),i*250);
-  setInterval(spawnPhoto,1500);
+  for(let i=0;i<4;i++)setTimeout(()=>spawnPhoto(),i*200);
+  setInterval(spawnPhoto,700);
 }
 
 /* ==========================================
