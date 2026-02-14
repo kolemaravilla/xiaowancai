@@ -1,18 +1,34 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-bg: #0d1117;
-  --color-surface: #161b22;
-  --color-surface-hover: #1c2333;
-  --color-border: #30363d;
+  --color-bg: #0a0e17;
+  --color-bg-alt: #0f1520;
+  --color-surface: #141c2b;
+  --color-surface-hover: #1a2540;
+  --color-surface-active: #1e2d4a;
+  --color-border: #243049;
+  --color-border-light: #2d3a55;
   --color-text: #e6edf3;
-  --color-text-muted: #8b949e;
+  --color-text-muted: #7d8da1;
+  --color-text-dim: #4a5568;
   --color-accent: #58a6ff;
   --color-accent-hover: #79b8ff;
+  --color-accent-dim: #1a3a5c;
   --color-green: #3fb950;
+  --color-green-dim: #1a3524;
   --color-yellow: #d29922;
+  --color-yellow-dim: #3d2e0a;
   --color-red: #f85149;
+  --color-red-dim: #3d1418;
   --color-purple: #bc8cff;
+  --color-purple-dim: #2a1a4a;
+  --color-cyan: #39d2c0;
+  --color-cyan-dim: #0d3330;
+  --color-pink: #f778ba;
+  --color-pink-dim: #3d1a30;
+  --color-orange: #f0883e;
+  --color-orange-dim: #3d2a10;
+  --color-xp: #ffd700;
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, "SF Mono", "Cascadia Code", monospace;
 }
@@ -23,20 +39,100 @@ body {
   font-family: var(--font-sans), system-ui, sans-serif;
 }
 
-/* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-bg);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
   background: var(--color-border);
   border-radius: 3px;
 }
 
-/* Focus visible */
 *:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes xpFloat {
+  0% { opacity: 1; transform: translateY(0) scale(1); }
+  70% { opacity: 1; transform: translateY(-40px) scale(1.1); }
+  100% { opacity: 0; transform: translateY(-60px) scale(0.9); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 4px rgba(88, 166, 255, 0.3); }
+  50% { box-shadow: 0 0 16px rgba(88, 166, 255, 0.6); }
+}
+@keyframes streak-fire {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+.animate-fade-in { animation: fadeIn 0.3s ease-out; }
+.animate-slide-up { animation: slideUp 0.4s ease-out; }
+.animate-slide-down { animation: slideDown 0.3s ease-out; }
+.animate-scale-in { animation: scaleIn 0.3s ease-out; }
+.animate-xp-float { animation: xpFloat 1.5s ease-out forwards; }
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent 25%, rgba(255,255,255,0.05) 50%, transparent 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+.animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+.animate-streak { animation: streak-fire 0.6s ease-in-out; }
+
+.stagger-1 { animation-delay: 0.05s; animation-fill-mode: both; }
+.stagger-2 { animation-delay: 0.1s; animation-fill-mode: both; }
+.stagger-3 { animation-delay: 0.15s; animation-fill-mode: both; }
+.stagger-4 { animation-delay: 0.2s; animation-fill-mode: both; }
+.stagger-5 { animation-delay: 0.25s; animation-fill-mode: both; }
+.stagger-6 { animation-delay: 0.3s; animation-fill-mode: both; }
+
+.gradient-border {
+  position: relative;
+}
+.gradient-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--color-accent), var(--color-purple), var(--color-cyan));
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.progress-bar-fill {
+  transition: width 0.6s ease-out;
+}
+
+.quiz-correct {
+  border-color: var(--color-green) !important;
+  background: var(--color-green-dim) !important;
+}
+.quiz-incorrect {
+  border-color: var(--color-red) !important;
+  background: var(--color-red-dim) !important;
 }
