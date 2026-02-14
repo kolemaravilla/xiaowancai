@@ -1,0 +1,1545 @@
+Project: Streamcrosser
+{
+  "project_summary": "Built a web application that accepts manual video uploads, transcribes audio with AI, translates subtitles, and re-uploads to Bilibili. Frontend deployed on Vercel, backend on Oracle Cloud, connected via Cloudflare Tunnel.",
+
+  "architecture": {
+    "pattern": "Client-Server Architecture",
+    "frontend": "Static single-page application (SPA) served by Vercel CDN",
+    "backend": "REST API server handling file uploads and background processing pipeline",
+    "communication": "HTTPS requests, Server-Sent Events (SSE) for real-time progress",
+    "proxy": "Cloudflare Tunnel (reverse proxy / secure tunnel between internet and private server)"
+  },
+
+  "languages": {
+    "python": {
+      "role": "Backend server and processing pipeline",
+      "version": "3.12 (system default on Ubuntu 24.04)",
+      "concepts": [
+        "Virtual environments (venv) — isolated package installs",
+        "Package management with pip",
+        "Async/await (asynchronous programming)",
+        "Decorators (@app.get, @app.post)",
+        "Dictionary data structures for in-memory state",
+        "f-strings for string formatting",
+        "Modules and imports",
+        "Background threads via asyncio.run_in_executor",
+        "Type hints (str, Optional, etc.)"
+      ],
+      "libraries": {
+        "FastAPI": "Web framework for building REST APIs",
+        "uvicorn": "ASGI server that runs the FastAPI app",
+        "CORSMiddleware": "Middleware to allow cross-origin browser requests",
+        "openai-whisper": "AI model for speech-to-text transcription",
+        "yt-dlp": "YouTube metadata scraper (used for metadata only)",
+        "ffmpeg-python": "Video/audio processing (subtitle burning, thumbnail generation)"
+      },
+      "commands": [
+        "python3 -m venv .venv",
+        "source .venv/bin/activate",
+        "pip install --upgrade pip",
+        "pip install <package>",
+        "python -m streamcrosser serve --host 0.0.0.0 --port 8000"
+      ]
+    },
+
+    "html_css_javascript": {
+      "role": "Frontend user interface",
+      "html_concepts": [
+        "Document structure (DOCTYPE, head, body)",
+        "Semantic elements (div, section, h1, p, span)",
+        "Form elements (input type=file, input type=url, button)",
+        "Data attributes",
+        "Inline event handlers"
+      ],
+      "css_concepts": [
+        "CSS custom properties (variables) — --green, --amber, etc.",
+        "Flexbox layout",
+        "CSS Grid",
+        "Media queries (responsive design)",
+        "Pseudo-elements (::before, ::after)",
+        "Animations and keyframes",
+        "Box model (margin, padding, border)",
+        "Monospace fonts and terminal-style UI design"
+      ],
+      "javascript_concepts": [
+        "Fetch API — making HTTP requests from browser",
+        "async/await — handling asynchronous operations",
+        "FormData — packaging file uploads",
+        "EventSource — listening to Server-Sent Events (SSE)",
+        "DOM manipulation (getElementById, innerHTML, classList)",
+        "JSON.parse / JSON.stringify",
+        "Template literals (backtick strings)",
+        "Arrow functions",
+        "Array methods (map, filter, sort, forEach)",
+        "Error handling (try/catch)",
+        "setTimeout / setInterval (timers)",
+        "Ternary operators",
+        "Destructuring",
+        "Regular expressions (regex) for URL pattern matching"
+      ]
+    },
+
+    "bash_shell": {
+      "role": "Server administration, deployment, automation",
+      "concepts": [
+        "Shell scripts (.sh files)",
+        "Variables and string interpolation",
+        "Conditionals (if/then/fi)",
+        "Pipe operator (|) — chaining command output",
+        "Redirection (>, >>, 2>&1)",
+        "File permissions (chmod +x)",
+        "Environment variables",
+        "Process management",
+        "Exit codes"
+      ],
+      "commands": {
+        "file_and_navigation": [
+          "ls — list directory contents",
+          "cd — change directory",
+          "mkdir — create directory",
+          "cat — display file contents",
+          "nano — terminal text editor",
+          "chmod — change file permissions"
+        ],
+        "networking": [
+          "curl — make HTTP requests from terminal",
+          "curl -v — verbose mode showing headers",
+          "curl -s — silent mode (no progress bar)",
+          "ss -tlnp — show listening TCP ports",
+          "iptables — firewall rule management"
+        ],
+        "package_management": [
+          "apt-get update — refresh package lists",
+          "apt-get install — install packages",
+          "dpkg -i — install .deb package files",
+          "wget — download files from the internet"
+        ],
+        "process_and_service": [
+          "systemctl start/stop/restart/status <service>",
+          "systemctl enable <service> — start on boot",
+          "systemctl daemon-reload — reload service definitions",
+          "journalctl -u <service> — view service logs",
+          "free -h — show memory usage",
+          "ps aux — list running processes"
+        ],
+        "git": [
+          "git clone — download repository",
+          "git pull origin <branch> — fetch and merge remote changes",
+          "git push -u origin <branch> — upload commits to remote",
+          "git checkout <branch> — switch branches",
+          "git add <file> — stage changes",
+          "git commit -m 'message' — save staged changes",
+          "git log --oneline — view commit history",
+          "git status — show working tree state",
+          "git diff — show file changes",
+          "git merge — combine branches"
+        ],
+        "ssh": [
+          "ssh user@host — remote shell login",
+          "ssh user@host 'command' — run single command remotely"
+        ]
+      }
+    }
+  },
+
+  "infrastructure_and_services": {
+    "oracle_cloud": {
+      "what": "Cloud provider offering Always Free tier virtual machines",
+      "used_for": "Hosting the backend server 24/7",
+      "concepts": [
+        "Virtual Machine (VM) instance",
+        "VM.Standard.E2.1.Micro — 1 vCPU, 1GB RAM free tier shape",
+        "VCN (Virtual Cloud Network) — private network for your VM",
+        "Subnet — subdivision of the VCN",
+        "Security List — cloud-level firewall rules (ingress/egress)",
+        "SSH key pair — public/private key authentication",
+        "Boot volume — persistent disk storage",
+        "Public IP address — internet-facing address for your VM"
+      ]
+    },
+
+    "vercel": {
+      "what": "Platform for deploying static websites and frontend apps",
+      "used_for": "Hosting the frontend HTML/CSS/JS",
+      "concepts": [
+        "Git-based deployment (push to main = auto-deploy)",
+        "CDN (Content Delivery Network) — serves files from edge locations",
+        "vercel.json — configuration file for routing and headers",
+        "Preview deployments — temporary URLs for each branch/PR"
+      ]
+    },
+
+    "cloudflare": {
+      "what": "DNS, CDN, and security provider",
+      "used_for": "Domain management, HTTPS tunnel to backend",
+      "concepts": [
+        "DNS (Domain Name System) — maps domain names to IP addresses",
+        "DNS records (A, CNAME, TXT)",
+        "Cloudflare Tunnel (cloudflared) — encrypted tunnel from your server to Cloudflare's edge",
+        "Named tunnel vs Quick tunnel (permanent URL vs temporary URL)",
+        "HTTPS/TLS/SSL — encrypted web traffic",
+        "Ingress rules — routing rules for tunnel traffic",
+        "530 errors — Cloudflare-specific timeout errors"
+      ],
+      "commands": [
+        "cloudflared tunnel login",
+        "cloudflared tunnel create <name>",
+        "cloudflared tunnel route dns <tunnel> <hostname>",
+        "cloudflared tunnel run <name>"
+      ],
+      "config_file": {
+        "path": "~/.cloudflared/config.yml",
+        "purpose": "Defines tunnel ID, credentials, and ingress routing rules"
+      }
+    },
+
+    "github": {
+      "what": "Git hosting platform for source code",
+      "used_for": "Version control, collaboration, CI/CD triggers",
+      "concepts": [
+        "Repository (repo) — project container",
+        "Branches — parallel versions of code",
+        "Feature branch workflow — develop on branch, merge via PR",
+        "Pull Request (PR) — request to merge a branch into main",
+        "Merge — combining branch histories",
+        "Remote (origin) — the GitHub-hosted copy of your repo",
+        "main branch — primary/production branch"
+      ]
+    }
+  },
+
+  "key_concepts": {
+    "networking": [
+      "HTTP methods: GET (read), POST (create/send), PUT (update), DELETE (remove)",
+      "HTTP status codes: 200 (OK), 403 (forbidden), 404 (not found), 500 (server error), 503 (service unavailable), 530 (origin error)",
+      "REST API — convention for structuring web service endpoints",
+      "API endpoint — a specific URL path that accepts requests (e.g., /api/health)",
+      "CORS (Cross-Origin Resource Sharing) — browser security policy controlling which websites can call your API",
+      "Mixed content — HTTPS page blocked from loading HTTP resources",
+      "Port — numbered channel on a server (e.g., 8000, 443, 80)",
+      "localhost (127.0.0.1) — refers to the current machine",
+      "Reverse proxy — intermediary that forwards client requests to a backend server",
+      "SSE (Server-Sent Events) — one-way real-time streaming from server to browser",
+      "WebSocket vs SSE vs Polling — different real-time communication patterns",
+      "Request headers — metadata sent with HTTP requests",
+      "JSON (JavaScript Object Notation) — universal data exchange format"
+    ],
+
+    "linux_server_admin": [
+      "Ubuntu — Linux distribution (operating system)",
+      "systemd — Linux service manager (starts/stops/monitors background processes)",
+      "systemd unit file (.service) — defines how to run a program as a service",
+      "iptables — Linux kernel firewall",
+      "Firewall rules — allow/deny network traffic by port, protocol, source",
+      "PEP 668 — Python packaging policy requiring virtual environments on system Python",
+      "File system paths — absolute (/home/ubuntu) vs relative (./config)",
+      "Permissions — user/group/other read/write/execute",
+      "Environment variables — system-wide key=value configuration",
+      ".env files — file-based environment variable storage",
+      "stdin/stdout/stderr — standard input/output/error streams",
+      "Daemon — background process that runs without user interaction"
+    ],
+
+    "software_engineering": [
+      "Frontend vs Backend — client-side UI vs server-side logic",
+      "API (Application Programming Interface) — contract between systems",
+      "Pipeline — sequential processing stages (upload → transcribe → translate → burn subtitles → upload)",
+      "Background job/task — work that runs asynchronously without blocking the user",
+      "Job state machine — tracking status transitions (queued → running → done/error)",
+      "In-memory storage — data stored in RAM (lost on restart) vs database (persistent)",
+      "CRUD operations — Create, Read, Update, Delete",
+      "Middleware — code that runs between receiving a request and handling it",
+      "Configuration management — separating config from code (.env files, config.py)",
+      "Deployment — process of making code available in production",
+      "CI/CD — Continuous Integration/Continuous Deployment (automated testing and deployment)",
+      "Version control — tracking changes to code over time (Git)",
+      "Dependencies — external libraries your code relies on"
+    ],
+
+    "ai_ml": [
+      "Whisper — OpenAI's speech-to-text model",
+      "Model sizes (tiny/base/small/medium/large) — tradeoff between accuracy and resource usage",
+      "Transcription — converting speech audio to text",
+      "OpenAI API — cloud AI service for translation and text generation",
+      "API key — secret token for authenticating with a paid service",
+      "LLM (Large Language Model) — AI model trained on text data"
+    ]
+  },
+
+  "files_we_created_or_modified": {
+    "frontend/index.html": "Single-page web app with upload form, progress display, and job dashboard",
+    "frontend/vercel.json": "Vercel deployment configuration",
+    "streamcrosser/web.py": "FastAPI backend — API endpoints, CORS, SSE streaming, job tracking",
+    "streamcrosser/config.py": "Application configuration with environment variable loading",
+    "streamcrosser/pipeline.py": "Processing pipeline — orchestrates transcription, translation, subtitle burning",
+    "streamcrosser/scraper.py": "YouTube metadata scraper using HTTP requests",
+    "streamcrosser/static/index.html": "Backend-served copy of the frontend",
+    "scripts/setup-server.sh": "Automated server setup script (packages, venv, systemd service)",
+    "scripts/setup-runner.sh": "Runner setup script",
+    "~/.cloudflared/config.yml": "Cloudflare Tunnel routing configuration (on VM, not in repo)",
+    "~/.streamcrosser.env": "API keys and environment config (on VM, not in repo)",
+    "/etc/systemd/system/streamcrosser.service": "systemd unit file for the backend (on VM)",
+    "/etc/systemd/system/cloudflared.service": "systemd unit file for the tunnel (on VM)"
+  },
+
+  "problems_solved_and_lessons": [
+    "Python version mismatch — hardcoded python3.11 didn't exist on Ubuntu 24.04 (ships 3.12). Use system python3.",
+    "PEP 668 — Ubuntu 24.04 blocks global pip installs. Must use virtual environments.",
+    "Firewall rule ordering — iptables rules are evaluated top-to-bottom; ACCEPT must come before REJECT.",
+    "Cloud firewall vs OS firewall — Oracle Security List AND iptables both must allow traffic.",
+    "Mixed content blocking — browsers refuse HTTP requests from HTTPS pages. Need HTTPS everywhere.",
+    "CORS errors — browsers block cross-origin API calls unless server sends proper headers.",
+    "Cloudflare 530 timeouts — long-running requests (>100s) get killed by Cloudflare's proxy, returning error pages without CORS headers, which browsers misreport as CORS errors.",
+    "Ephemeral vs persistent tunnels — quick tunnels change URL on restart; named tunnels with custom domains are permanent.",
+    "In-memory state loss — jobs stored in RAM disappear on server restart. Don't restart during active jobs.",
+    "Cloud Shell vs SSH — Oracle Cloud Shell is NOT the VM. Must SSH into the VM to run server commands."
+  ],
+
+  "suggested_learning_order": [
+    "1. HTML/CSS basics — understand how web pages are structured and styled",
+    "2. JavaScript fundamentals — variables, functions, DOM manipulation, fetch API",
+    "3. Command line / Bash basics — navigating files, running programs",
+    "4. Git version control — commits, branches, push/pull, merging",
+    "5. Python basics — syntax, data types, functions, imports",
+    "6. Networking fundamentals — HTTP, DNS, ports, client-server model, APIs",
+    "7. REST APIs — endpoints, methods, status codes, JSON",
+    "8. FastAPI / web frameworks — building a backend server",
+    "9. Linux server administration — SSH, systemd, firewalls, file permissions",
+    "10. Cloud infrastructure — VMs, networking, security groups, deployment",
+    "11. DNS and domains — how domain names work, Cloudflare, HTTPS/TLS",
+    "12. CI/CD and deployment — Vercel, Git-based deploys, environment variables"
+  ]
+}
+
+
+Project: Money Printer
+
+{
+  "meta": {
+    "purpose": "Comprehensive technical reference for teaching a beginner everything used to build this project",
+    "project": "chaopiaodayinji — Autonomous AI Paper Trading Bot",
+    "description": "A multi-LLM council-based stock trading bot with dynamic strategy management, position monitoring, a web dashboard, and Telegram remote control",
+    "audience": "Zero prerequisite knowledge — start from scratch"
+  },
+
+  "languages": {
+    "python": {
+      "version": "3.11",
+      "role": "Primary backend language — all trading logic, API integrations, data processing",
+      "concepts_used": [
+        "async/await (non-blocking I/O for API calls)",
+        "asyncio.run() (entry point for async programs)",
+        "asyncio.gather() (run multiple async tasks concurrently)",
+        "classes and objects (AlpacaBroker, Database, StrategyManager)",
+        "modules and imports (src/ package with __init__.py)",
+        "decorators (not custom, but used via libraries)",
+        "f-strings (formatted string literals)",
+        "list comprehensions ([x for x in items if condition])",
+        "dictionary comprehensions ({k: v for k, v in ...})",
+        "type hints (def func(x: str) -> dict)",
+        "Optional, Dict, List, Tuple from typing module",
+        "try/except/finally (error handling)",
+        "context managers (async with for HTTP clients)",
+        "os.environ.get() (reading environment variables)",
+        "json.loads() / json.dumps() (JSON serialization)",
+        "datetime, timedelta, date (date/time manipulation)",
+        "sys.path manipulation (importing from sibling directories)",
+        "**kwargs / *args (variable arguments)",
+        "ternary expressions (x if condition else y)",
+        "string slicing and manipulation",
+        "set operations (deduplication)",
+        "enum-like constants (string constants for status values)",
+        "global/module-level singletons (_broker_instance, _db_instance)"
+      ],
+      "key_libraries": {
+        "httpx": "Async HTTP client — makes API calls without blocking",
+        "pandas": "Data analysis — DataFrames for price history, rolling averages",
+        "numpy": "Numerical operations — array math for indicators",
+        "yfinance": "Yahoo Finance data — fetch stock price history",
+        "python-dateutil": "Advanced date parsing and timezone handling",
+        "Pillow": "Image generation (used to create favicon PNGs)"
+      }
+    },
+    "javascript": {
+      "type": "Vanilla ES6+ (no React, no Vue, no build tools)",
+      "role": "Frontend dashboard — fetches data and renders UI",
+      "concepts_used": [
+        "async/await (fetching API data)",
+        "fetch() API (HTTP requests from browser)",
+        "Promises (.then/.catch, or await)",
+        "DOM manipulation (getElementById, innerHTML, style)",
+        "addEventListener (click handlers, input events)",
+        "template literals (backtick strings with ${variables})",
+        "arrow functions (const fn = () => {})",
+        "destructuring ({ key } = object)",
+        "ternary operators",
+        "Array methods (reduce, filter, map, forEach, sort, slice)",
+        "localStorage (persist auth token across page loads)",
+        "sessionStorage (store config password per tab session)",
+        "setInterval (auto-refresh every 60 seconds)",
+        "JSON.parse / JSON.stringify",
+        "try/catch for error handling",
+        "conditional rendering (show/hide elements based on data)",
+        "dynamic table generation",
+        "number formatting (toFixed, toLocaleString)"
+      ]
+    },
+    "html5": {
+      "role": "Single-page dashboard structure",
+      "concepts_used": [
+        "Semantic elements (header, main, section)",
+        "Meta tags (viewport, charset, apple-mobile-web-app-capable)",
+        "Link tags (favicon, apple-touch-icon)",
+        "Input elements (text, password, checkbox, select)",
+        "Data attributes",
+        "Inline script and style (single-file app)"
+      ]
+    },
+    "css": {
+      "role": "Dashboard styling — dark theme, responsive layout",
+      "concepts_used": [
+        "CSS custom properties / variables (--bg, --surface, --green, --red)",
+        "CSS Grid (grid-template-columns: repeat(auto-fit, minmax()))",
+        "CSS Flexbox (display: flex, justify-content, align-items, gap)",
+        "Media queries (@media max-width: 600px for mobile)",
+        "Transitions (transition: background 0.3s)",
+        "Pseudo-classes (:hover, :checked)",
+        "Border-radius (rounded corners)",
+        "Box-shadow",
+        "Overflow handling (overflow-x: auto for tables)",
+        "Responsive units (rem, %, vw)"
+      ]
+    },
+    "sql": {
+      "dialect": "PostgreSQL (hosted on Supabase)",
+      "role": "Database schema, migrations, security policies",
+      "concepts_used": [
+        "CREATE TABLE with column types (TEXT, FLOAT, BOOLEAN, JSONB, TIMESTAMPTZ)",
+        "INSERT INTO ... VALUES",
+        "ON CONFLICT (key) DO NOTHING (upsert / idempotent insert)",
+        "ON CONFLICT (key) DO UPDATE SET ... (true upsert)",
+        "ALTER TABLE ADD COLUMN",
+        "CREATE INDEX",
+        "CREATE POLICY (Row-Level Security)",
+        "ENABLE ROW LEVEL SECURITY",
+        "DO $$ ... END $$ (anonymous PL/pgSQL blocks)",
+        "DECLARE variables in PL/pgSQL",
+        "FOREACH ... IN ARRAY (loop over arrays)",
+        "IF NOT EXISTS checks (idempotent operations)",
+        "EXECUTE format() (dynamic SQL)",
+        "SELECT from information_schema (introspection)",
+        "pg_policies system catalog (query existing policies)",
+        "DEFAULT values",
+        "NOT NULL constraints",
+        "UNIQUE constraints",
+        "REFERENCES (foreign keys)",
+        "Triggers (updated_at auto-timestamp)"
+      ]
+    },
+    "yaml": {
+      "role": "GitHub Actions workflow definitions",
+      "concepts_used": [
+        "Key-value pairs",
+        "Nested objects (indentation-based)",
+        "Arrays (- item syntax)",
+        "Multi-line strings (| for literal blocks)",
+        "Variable interpolation (${{ secrets.NAME }}, ${{ inputs.NAME }})",
+        "Conditional expressions (if: inputs.confirm == 'RESET')",
+        "Cron expressions (schedule triggers)"
+      ]
+    },
+    "json": {
+      "role": "API request/response format, configuration files",
+      "concepts_used": [
+        "Objects ({key: value})",
+        "Arrays ([item1, item2])",
+        "Nested structures",
+        "Data types (string, number, boolean, null)",
+        "vercel.json (deployment routing config)"
+      ]
+    }
+  },
+
+  "external_services": {
+    "alpaca": {
+      "what": "Stock brokerage API for paper trading (simulated trading with real market data)",
+      "auth_method": "API key + Secret key sent in HTTP headers",
+      "base_url": "https://paper-api.alpaca.markets",
+      "endpoints_used": [
+        "GET /v2/account — get account balance, equity, cash",
+        "GET /v2/positions — list all open stock positions",
+        "GET /v2/positions/{symbol} — get one position",
+        "POST /v2/orders — place a buy/sell order",
+        "DELETE /v2/orders/{id} — cancel an order",
+        "DELETE /v2/positions/{symbol} — close one position (market sell)",
+        "DELETE /v2/positions — close ALL positions",
+        "GET /v2/stocks/{symbol}/bars — historical price data (OHLCV)",
+        "GET /v2/stocks/{symbol}/quotes/latest — current bid/ask"
+      ]
+    },
+    "supabase": {
+      "what": "Backend-as-a-service built on PostgreSQL — provides a REST API over your database",
+      "auth_method": "API key in 'apikey' header + Bearer token in Authorization header",
+      "key_types": {
+        "anon_key": "Public key — respects Row-Level Security policies",
+        "service_role_key": "Admin key — bypasses all RLS (never expose to frontend)"
+      },
+      "rest_api_pattern": "GET/POST/PATCH/DELETE to /rest/v1/{table_name}?query_params",
+      "query_params_used": [
+        "select=col1,col2 (choose columns)",
+        "column=eq.value (equality filter)",
+        "column=neq.value (not equal)",
+        "column=gte.value (greater than or equal)",
+        "column=lt.value (less than)",
+        "column=in.(val1,val2) (IN list)",
+        "order=column.desc (sort descending)",
+        "limit=N (max rows)",
+        "Prefer: return=representation header (return inserted/updated row)"
+      ],
+      "tables": [
+        "config — key/value settings store",
+        "trades — every buy/sell record",
+        "positions — current open positions (synced from Alpaca)",
+        "council_analyses — LLM voting records and reasoning",
+        "stock_screens — daily screening results per strategy",
+        "trade_outcomes — P&L tracking with MFE/MAE",
+        "daily_summaries — end-of-day performance snapshots",
+        "watchlist — stocks flagged for monitoring",
+        "strategies — strategy definitions and metadata",
+        "strategy_performance — per-strategy win rates and metrics",
+        "system_logs — audit trail of all bot actions",
+        "schema_migrations — tracks which SQL migrations have been applied"
+      ]
+    },
+    "openai_api": {
+      "what": "ChatGPT / GPT-4 — used for fundamental stock analysis",
+      "auth_method": "Bearer token in Authorization header",
+      "endpoint": "POST https://api.openai.com/v1/chat/completions",
+      "parameters": ["model", "messages (array of {role, content})", "temperature", "max_tokens"],
+      "role_in_project": "One of three LLM 'council members' — handles financial reasoning"
+    },
+    "anthropic_api": {
+      "what": "Claude AI — used as the skeptical decision-maker",
+      "auth_method": "x-api-key header + anthropic-version header",
+      "endpoint": "POST https://api.anthropic.com/v1/messages",
+      "parameters": ["model", "messages", "temperature", "max_tokens"],
+      "role_in_project": "Final vote in the LLM council — skeptical analysis and risk assessment"
+    },
+    "zhipu_api": {
+      "what": "GLM-4 (Chinese AI model) — used for technical chart analysis",
+      "auth_method": "Bearer token in Authorization header",
+      "endpoint": "POST https://open.bigmodel.cn/api/paas/v4/chat/completions",
+      "role_in_project": "Technical analysis specialist in the LLM council"
+    },
+    "telegram_bot_api": {
+      "what": "Messaging platform API — remote control for the bot via phone",
+      "auth_method": "Bot token embedded in URL",
+      "endpoints_used": [
+        "POST /bot{token}/sendMessage — send notifications",
+        "GET /bot{token}/getUpdates — poll for new commands (long polling)"
+      ],
+      "commands_implemented": [
+        "/status — account overview",
+        "/positions — open positions list",
+        "/balance — cash and equity",
+        "/close <symbol> — close one position",
+        "/closeall — emergency close all",
+        "/pause — stop trading",
+        "/resume — resume trading",
+        "/config — show settings",
+        "/set <key> <value> — change a setting",
+        "/help — list all commands"
+      ]
+    },
+    "yahoo_finance": {
+      "what": "Free stock data via yfinance Python library",
+      "usage": "Fetch historical OHLCV bars for technical indicator calculations",
+      "methods": ["Ticker(symbol).history(period, interval)"]
+    },
+    "vercel": {
+      "what": "Serverless hosting platform — hosts the web dashboard",
+      "config_file": "vercel.json",
+      "routing": "Routes /api/* to Python serverless functions, /* to public/index.html"
+    }
+  },
+
+  "architecture_and_design_patterns": {
+    "overall": "Event-driven scheduled pipeline: Screen → Analyze → Decide → Trade → Monitor",
+    "patterns": [
+      {
+        "name": "Singleton",
+        "where": "broker.py, database.py",
+        "what": "One shared instance of the broker/database client, reused everywhere"
+      },
+      {
+        "name": "Strategy Pattern",
+        "where": "strategy_manager.py",
+        "what": "Multiple trading strategies that get selected based on market regime"
+      },
+      {
+        "name": "Council / Voting Pattern",
+        "where": "council.py",
+        "what": "Three independent LLMs analyze a stock, then a final LLM synthesizes their votes"
+      },
+      {
+        "name": "REST API Wrapper / Adapter",
+        "where": "database.py, broker.py",
+        "what": "Python classes that wrap raw HTTP calls into clean method interfaces"
+      },
+      {
+        "name": "Check-Before-Insert (Idempotency)",
+        "where": "database.py",
+        "what": "Query if a record exists before inserting to avoid duplicate/conflict errors"
+      },
+      {
+        "name": "Config with Defaults Fallback",
+        "where": "config.py, api/data.py",
+        "what": "Try to read from database; if empty, fall back to hardcoded default values"
+      },
+      {
+        "name": "Scheduled Pipeline",
+        "where": "GitHub Actions workflows",
+        "what": "Cron-triggered jobs that run the bot on a schedule without a server"
+      },
+      {
+        "name": "Long Polling",
+        "where": "scripts/telegram_listener.py",
+        "what": "Repeatedly ask Telegram 'any new messages?' with a timeout, process, repeat"
+      },
+      {
+        "name": "Dynamic Trailing Stop",
+        "where": "outcome_tracker.py",
+        "what": "Stop-loss price moves up as the stock price rises, locking in gains"
+      },
+      {
+        "name": "Migration Tracking",
+        "where": "run-migration.yml, schema_migrations table",
+        "what": "Track which SQL files have been applied so they don't run twice"
+      }
+    ]
+  },
+
+  "trading_concepts": {
+    "fundamentals": [
+      "Stock / Equity — a share of ownership in a company",
+      "Position — holding shares of a stock (long = you own it, expecting price to rise)",
+      "Portfolio — collection of all your positions",
+      "Equity — total value of your account (cash + positions)",
+      "Cash — uninvested money in your account",
+      "P&L (Profit and Loss) — how much you've gained or lost",
+      "Realized P&L — profit/loss from closed trades",
+      "Unrealized P&L — paper profit/loss on open positions",
+      "Paper trading — simulated trading with fake money but real market prices"
+    ],
+    "orders": [
+      "Market order — buy/sell immediately at current price",
+      "Limit order — buy/sell only at a specific price or better",
+      "Time-in-force — how long the order stays active (day, GTC=good-til-cancelled)",
+      "Entry price — the price you bought at",
+      "Exit price — the price you sold at"
+    ],
+    "risk_management": [
+      "Stop loss — automatic sell if price drops to a level (limits losses)",
+      "Take profit / Target — automatic sell if price reaches your goal",
+      "Trailing stop — stop loss that moves up as price rises",
+      "Position sizing — how many shares to buy based on risk tolerance",
+      "Risk per trade — max % of portfolio you're willing to lose per trade",
+      "Daily loss limit — max total loss allowed in one day",
+      "Max positions — cap on how many stocks you hold at once",
+      "Capital allocation — using only a subset of your account for trading"
+    ],
+    "technical_indicators": [
+      "OHLCV — Open, High, Low, Close, Volume (one bar of price data)",
+      "RSI (Relative Strength Index) — momentum oscillator (0-100, <30=oversold, >70=overbought)",
+      "SMA (Simple Moving Average) — average price over N periods (20, 50, 200 common)",
+      "MACD (Moving Average Convergence Divergence) — trend and momentum signal",
+      "Bollinger Bands — volatility envelope around a moving average",
+      "ATR (Average True Range) — measures price volatility",
+      "Volume — number of shares traded; spikes signal interest"
+    ],
+    "market_regimes": [
+      "Bull market — prices trending up (SMA50 > SMA200)",
+      "Bear market — prices trending down (SMA50 < SMA200)",
+      "Sideways / Range-bound — prices moving in a range, no clear trend",
+      "Golden cross — SMA50 crosses above SMA200 (bullish signal)",
+      "Death cross — SMA50 crosses below SMA200 (bearish signal)"
+    ],
+    "strategies_used": [
+      "Mean reversion — buy when RSI is oversold, expecting bounce back",
+      "Momentum breakout — buy strong uptrends",
+      "Volume reversal — buy after high-volume selloffs (capitulation)",
+      "Post-earnings drift — trade after earnings announcements"
+    ],
+    "performance_metrics": [
+      "Win rate — % of trades that were profitable",
+      "MFE (Maximum Favorable Excursion) — best unrealized gain during a trade",
+      "MAE (Maximum Adverse Excursion) — worst unrealized loss during a trade",
+      "Drawdown — peak-to-trough decline in portfolio value"
+    ]
+  },
+
+  "infrastructure_concepts": {
+    "git_and_github": [
+      "git — version control system that tracks file changes",
+      "repository (repo) — a project tracked by git",
+      "commit — a saved snapshot of changes with a message",
+      "branch — a parallel version of the code",
+      "push — upload local commits to GitHub",
+      "pull — download remote changes",
+      "fetch — download remote info without merging",
+      "merge — combine two branches",
+      "checkout — switch branches or restore files"
+    ],
+    "github_actions": [
+      "Workflow — automated pipeline defined in a .yml file",
+      "Job — a set of steps that run on one machine",
+      "Step — a single command or action within a job",
+      "Runner — the virtual machine that executes the job (ubuntu-latest)",
+      "Trigger — what starts the workflow (push, schedule, manual dispatch)",
+      "Cron schedule — Unix time format: minute hour day month weekday",
+      "Secrets — encrypted variables stored in GitHub, injected as env vars",
+      "Artifacts — files saved from a workflow run (logs, reports)",
+      "workflow_dispatch — manual trigger with optional input parameters",
+      "Permissions — what the workflow can do (contents: write for pushing)"
+    ],
+    "environment_variables": [
+      "What — key=value pairs available to running programs",
+      "Why — store secrets and config outside of code",
+      "os.environ — Python's way to read them",
+      "GitHub Secrets — encrypted env vars for Actions workflows",
+      "process.env — JavaScript/Node equivalent (used in Vercel)"
+    ],
+    "http_and_rest": [
+      "HTTP — protocol for web communication",
+      "REST API — web service that uses HTTP verbs on resources",
+      "GET — read data",
+      "POST — create data",
+      "PATCH — update data",
+      "DELETE — remove data",
+      "Headers — metadata sent with requests (auth tokens, content type)",
+      "Status codes — 200 OK, 201 Created, 400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found, 409 Conflict",
+      "JSON body — data sent/received in requests",
+      "Query parameters — filters in the URL (?key=value&key2=value2)",
+      "Bearer token — auth pattern: Authorization: Bearer <token>"
+    ],
+    "serverless": [
+      "What — code that runs on-demand without managing servers",
+      "Vercel Functions — Python/JS functions triggered by HTTP requests",
+      "Cold start — slight delay on first invocation",
+      "Stateless — no persistent memory between invocations (use database instead)"
+    ],
+    "database_administration": [
+      "Schema — the structure of your tables (columns, types, constraints)",
+      "Migration — a versioned SQL file that changes the schema",
+      "RLS (Row-Level Security) — database-level access control per row",
+      "Policy — a rule defining who can SELECT/INSERT/UPDATE/DELETE which rows",
+      "Connection string — URL format: postgresql://user:password@host:port/database",
+      "Connection pooler — intermediary that manages database connections efficiently",
+      "Idempotent — safe to run multiple times with same result (ON CONFLICT DO NOTHING)"
+    ]
+  },
+
+  "security_concepts": [
+    "API keys — secret strings that authenticate your app to a service",
+    "Bearer tokens — auth method where token is sent in Authorization header",
+    "Row-Level Security (RLS) — database restricts which rows each user can see",
+    "anon vs service_role — public key (restricted) vs admin key (full access)",
+    "Environment variables for secrets — never hardcode keys in source code",
+    "HTTPS — encrypted HTTP (all API calls use this)",
+    "sessionStorage — browser storage that clears when tab closes (used for passwords)",
+    "localStorage — browser storage that persists (used for auth tokens)",
+    "Password hashing — storing passwords securely (note: this project stores plaintext in DB, not ideal)",
+    "Input validation — checking user input before processing (config value ranges)"
+  ],
+
+  "development_workflow": [
+    "Write code locally",
+    "Test with dry runs and status checks",
+    "Commit changes to git",
+    "Push to GitHub",
+    "GitHub Actions runs automated workflows",
+    "Vercel auto-deploys the dashboard on push",
+    "Monitor via dashboard and Telegram notifications",
+    "Debug via system_logs table and workflow run logs",
+    "Apply database changes via migration workflows",
+    "Pull live schema to verify database state"
+  ],
+
+  "files_and_their_purposes": {
+    "src/main.py": "Orchestrator — runs the daily trading pipeline: screen stocks, get LLM analysis, execute trades",
+    "src/broker.py": "Alpaca API wrapper — all buy/sell/position operations",
+    "src/database.py": "Supabase API wrapper — all database read/write operations",
+    "src/config.py": "Configuration manager — reads settings from DB with fallback defaults",
+    "src/council.py": "LLM council — sends stock data to 3 AI models, synthesizes their votes",
+    "src/strategy_manager.py": "Strategy router — detects market regime, picks appropriate strategy",
+    "src/outcome_tracker.py": "Position monitor — checks if stops/targets hit, calculates dynamic trailing stops",
+    "src/notifications.py": "Telegram sender — formats and sends notification messages",
+    "src/analytics.py": "Performance analytics — win rates, P&L summaries, reports",
+    "src/telegram_commands.py": "Command handler — processes Telegram commands like /status, /close, /pause",
+    "scripts/telegram_listener.py": "Telegram poller — continuously polls for new commands",
+    "scripts/reset_experiment.py": "Reset tool — closes all positions and sets fresh capital",
+    "scripts/configure_trading_capital.py": "Capital config — enable/disable capital allocation from CLI",
+    "api/data.py": "Dashboard API — Vercel serverless function that returns all dashboard data",
+    "api/config.py": "Config API — Vercel serverless function for reading/updating config",
+    "public/index.html": "Dashboard — single HTML file with embedded CSS and JS",
+    "public/chaopiaodayinji.png": "App icon — used as favicon and iPhone bookmark icon",
+    "vercel.json": "Vercel config — routes API calls to Python functions",
+    "requirements.txt": "Python dependencies — list of packages to install with pip",
+    "database/migrations/*.sql": "Schema migrations — versioned SQL files that modify the database",
+    "database/LIVE_SCHEMA.sql": "Schema snapshot — pulled from live Supabase for reference",
+    ".github/workflows/daily_run.yml": "Daily trading — runs the bot at 11:30 PM UTC",
+    ".github/workflows/position_monitor.yml": "Position checker — runs every 15 min during market hours",
+    ".github/workflows/reset-experiment.yml": "Reset workflow — manual action to close all and restart",
+    ".github/workflows/run-migration.yml": "Migration runner — applies SQL migrations to Supabase",
+    ".github/workflows/pull-schema.yml": "Schema puller — dumps live schema for reference"
+  }
+}
+
+Project: NuVoKa
+{
+  "meta": {
+    "title": "Nuvoka Project - Complete Coding Terminology & Technology Guide",
+    "purpose": "A zero-prerequisite reference of every technology, concept, tool, and pattern used to build the Nuvoka language-learning platform. Organized for an LLM tutor to teach a complete beginner what each thing is and why it was used.",
+    "project_summary": "Nuvoka is a language-learning web and mobile app supporting Chinese, English, and French. It uses adaptive algorithms to serve vocabulary quizzes, grammar exercises, graded reading articles, and live subtitle/camera-based learning. The backend is serverless (Supabase edge functions), the frontend is React/Next.js, data processing is Python, and everything is deployed via GitHub Actions."
+  },
+
+  "languages": {
+    "TypeScript": {
+      "what": "A superset of JavaScript that adds static type annotations. You declare what type each variable, function parameter, and return value should be, and the compiler catches mistakes before runtime.",
+      "used_for": ["Frontend React components", "Supabase edge functions", "Utility scripts"],
+      "key_concepts": [
+        "interfaces and types - blueprints describing the shape of data objects",
+        "generics - reusable type templates like Array<string>",
+        "enums - named sets of constant values",
+        "union types - a value that can be one of several types (string | number)",
+        "async/await - syntax for handling asynchronous operations",
+        "type inference - TypeScript guesses the type when you don't annotate",
+        "strict mode - compiler setting that enforces maximum type safety",
+        "tsconfig.json - configuration file controlling how TypeScript compiles"
+      ]
+    },
+    "JavaScript": {
+      "what": "The programming language of the web. Runs in browsers and on servers (Node.js). TypeScript compiles down to JavaScript.",
+      "used_for": ["Community content ingestion scripts (.mjs files)", "Runtime execution of all TypeScript code after compilation"],
+      "key_concepts": [
+        "ES modules (import/export) - modern way to share code between files",
+        ".mjs extension - explicitly marks a file as an ES module",
+        "Promises - objects representing eventual completion of async work",
+        "arrow functions - concise function syntax: (x) => x + 1",
+        "destructuring - extracting values from objects/arrays: const { name } = user",
+        "template literals - backtick strings with embedded expressions: `Hello ${name}`",
+        "spread operator - expands arrays/objects: { ...oldObj, newProp: value }",
+        "optional chaining - safe property access: user?.profile?.name",
+        "nullish coalescing - fallback for null/undefined: value ?? defaultValue"
+      ]
+    },
+    "Python": {
+      "what": "A high-level general-purpose language known for readability and rich data-science libraries.",
+      "used_for": ["Linguistics data processing", "Embedding generation", "Relationship validation", "Content ingestion and enrichment"],
+      "key_concepts": [
+        "virtual environments - isolated package installations per project",
+        "pip install - Python's package manager command",
+        "list comprehensions - concise syntax to build lists: [x*2 for x in items]",
+        "dictionaries - key-value data structures",
+        "f-strings - formatted string literals: f'Hello {name}'",
+        "pandas DataFrames - tabular data manipulation",
+        "numpy arrays - efficient numerical arrays",
+        "batch processing patterns - processing data in chunks to avoid memory/API limits"
+      ]
+    },
+    "SQL": {
+      "what": "Structured Query Language - the standard language for relational databases. Used to create tables, insert/update/delete data, and query it.",
+      "used_for": ["PostgreSQL database migrations", "Supabase RPC stored procedures", "Row Level Security policies"],
+      "key_concepts": [
+        "SELECT, INSERT, UPDATE, DELETE - the four core data manipulation commands",
+        "CREATE TABLE - defines a new table with columns and their types",
+        "ALTER TABLE - modifies an existing table structure",
+        "JOIN - combines rows from two or more tables based on related columns",
+        "WHERE - filters rows based on conditions",
+        "GROUP BY / HAVING - aggregates rows and filters groups",
+        "INDEX - speeds up queries on specific columns",
+        "PRIMARY KEY - unique identifier for each row",
+        "FOREIGN KEY - links one table's column to another table's primary key",
+        "UUID - universally unique identifier, used as primary keys instead of incrementing integers",
+        "JSONB - PostgreSQL's binary JSON column type for flexible data",
+        "CREATE OR REPLACE FUNCTION - defines a stored procedure/function",
+        "TRIGGER - automatic action that fires on INSERT/UPDATE/DELETE",
+        "MATERIALIZED VIEW - a cached query result that can be refreshed periodically",
+        "RLS (Row Level Security) - policies that control which rows a user can see/edit",
+        "GRANT / REVOKE - permission management for database roles",
+        "migrations - versioned .sql files applied sequentially to evolve the database schema"
+      ]
+    },
+    "HTML_CSS": {
+      "what": "HTML structures web page content; CSS styles it. In this project, both are generated through React components and Tailwind utility classes rather than written directly.",
+      "used_for": ["Rendered output of React components", "Tailwind utility classes in JSX"],
+      "key_concepts": [
+        "JSX - HTML-like syntax inside JavaScript/TypeScript React components",
+        "className - React's version of HTML's class attribute",
+        "responsive design - layouts that adapt to different screen sizes",
+        "CSS variables - custom properties like --primary-color for theming",
+        "flexbox and grid - modern CSS layout systems"
+      ]
+    }
+  },
+
+  "frameworks": {
+    "Next.js": {
+      "what": "A React framework that adds server-side rendering, file-based routing, API routes, and build optimizations on top of React.",
+      "version": "14.2.32",
+      "used_for": "Both the learner-facing app and the partner/contributor app",
+      "key_concepts": [
+        "App Router - file-system based routing where folder structure = URL structure",
+        "Server Components - React components that render on the server, reducing client JavaScript",
+        "Client Components - marked with 'use client', run in the browser for interactivity",
+        "API Routes - backend endpoints defined as files in the app directory",
+        "Dynamic routes - folder names like [locale] or [id] that become URL parameters",
+        "Middleware - code that runs before every request (used for locale detection)",
+        "Static Site Generation (SSG) - pre-renders pages at build time",
+        "Server-Side Rendering (SSR) - renders pages on each request",
+        "next.config.mjs - configuration file for build settings, redirects, etc."
+      ]
+    },
+    "React": {
+      "what": "A JavaScript library for building user interfaces using reusable components.",
+      "version": "18.3.1",
+      "used_for": "All UI rendering in both apps",
+      "key_concepts": [
+        "Components - reusable UI building blocks (functions that return JSX)",
+        "Props - data passed from a parent component to a child",
+        "State (useState) - data that changes over time and triggers re-renders",
+        "Effects (useEffect) - side effects like API calls, run after render",
+        "Context (useContext) - sharing data across many components without prop drilling",
+        "Hooks - functions like useState, useEffect, useCallback that add features to components",
+        "useCallback / useMemo - performance optimizations to avoid unnecessary recalculations",
+        "useRef - holds a mutable value that persists across renders without causing re-renders",
+        "Custom hooks - reusable logic extracted into hook functions (e.g., useSpeechRecognition)",
+        "Conditional rendering - showing different UI based on state: {isLoading ? <Spinner /> : <Content />}",
+        "Lists and keys - rendering arrays of components with unique key props"
+      ]
+    },
+    "Deno": {
+      "what": "A secure JavaScript/TypeScript runtime (alternative to Node.js) used by Supabase for edge functions. Runs TypeScript natively without a compile step.",
+      "used_for": "All Supabase edge functions",
+      "key_concepts": [
+        "JSR imports - importing packages from the JSR (JavaScript Registry) via URL-like specifiers",
+        "Deno.serve() - built-in HTTP server API",
+        "Permission model - Deno restricts file/network access by default",
+        "No node_modules - dependencies are cached globally, not per-project",
+        "Native TypeScript - no compilation step needed"
+      ]
+    },
+    "Capacitor": {
+      "what": "A cross-platform runtime that wraps a web app in a native iOS/Android shell, giving access to device APIs (camera, storage, etc.).",
+      "version": "7.0.0",
+      "used_for": "Packaging the learner app as a native mobile app",
+      "key_concepts": [
+        "WebView - the native container that renders your web app",
+        "Plugins - bridges between web code and native device APIs (SplashScreen, Keyboard)",
+        "capacitor.config.ts - configuration for the native wrapper",
+        "iOS and Android directories - native project files generated by Capacitor",
+        "Content insets - handling safe areas on devices with notches"
+      ]
+    }
+  },
+
+  "platforms_and_infrastructure": {
+    "Supabase": {
+      "what": "An open-source Firebase alternative providing a PostgreSQL database, authentication, edge functions, file storage, and real-time subscriptions as a managed service.",
+      "used_for": "The entire backend: database, auth, serverless functions, and storage",
+      "key_concepts": [
+        "Project - a Supabase instance with its own database, auth, and functions",
+        "Edge Functions - serverless TypeScript/Deno functions deployed to Supabase's edge network",
+        "Auth - built-in user authentication with email, OAuth providers, JWT tokens",
+        "RLS (Row Level Security) - database-level policies ensuring users can only access their own data",
+        "RPC (Remote Procedure Call) - calling stored SQL functions from your app code",
+        "Realtime - WebSocket-based live data subscriptions",
+        "Storage - file upload and serving (images, audio)",
+        "Service Role Key - a secret key that bypasses RLS for admin/backend operations",
+        "Anon Key - a public key with limited permissions, used by the client",
+        "supabase-js - the JavaScript client library for interacting with Supabase",
+        "Supabase CLI - local development tool for running migrations and functions locally",
+        "config.toml - Supabase project configuration"
+      ]
+    },
+    "PostgreSQL": {
+      "what": "An advanced open-source relational database. Supabase runs PostgreSQL under the hood.",
+      "version": "15",
+      "key_concepts": [
+        "Relational model - data organized into tables with rows and columns",
+        "JSONB columns - storing flexible JSON data inside a relational table",
+        "Extensions - optional modules that add functionality (pg_cron, pg_net, http, pg_graphql, pg_stat_statements)",
+        "pg_cron - schedules recurring SQL jobs (like a cron job but inside the database)",
+        "pg_net - makes HTTP requests from within SQL functions",
+        "Stored procedures - reusable SQL functions stored in the database",
+        "Transactions - grouping multiple operations so they all succeed or all fail",
+        "Connection pooling - sharing database connections efficiently across many requests"
+      ]
+    },
+    "GitHub": {
+      "what": "A platform for hosting Git repositories with collaboration features like pull requests, issues, and CI/CD via GitHub Actions.",
+      "used_for": "Source code hosting, all CI/CD, workflow-based script execution",
+      "key_concepts": [
+        "Repository - a project's complete codebase and history",
+        "Branch - a parallel version of the code for developing features",
+        "Commit - a saved snapshot of changes with a message describing what changed",
+        "Pull Request (PR) - a proposal to merge changes from one branch into another",
+        "GitHub Actions - automated workflows triggered by events (push, manual, schedule)",
+        "workflow_dispatch - a manual trigger that lets you run workflows from the GitHub UI with custom inputs",
+        "Secrets - encrypted environment variables for API keys and credentials",
+        "YAML workflow files - .yml files in .github/workflows/ that define automation pipelines",
+        "Jobs and Steps - workflows contain jobs, which contain sequential steps",
+        "Runners - virtual machines (ubuntu-latest) that execute workflow steps"
+      ]
+    },
+    "GitHub_Actions_Workflows": {
+      "what": "The specific automated pipelines defined for this project. Since there is no local dev environment, ALL scripts run through these workflows.",
+      "workflows": [
+        {
+          "file": "generate-quiz-cache.yml",
+          "purpose": "Pre-generates quiz questions using OpenAI and caches them in the database"
+        },
+        {
+          "file": "validate-relationships.yml",
+          "purpose": "Analyzes distractor effectiveness data and promotes/demotes vocabulary relationships"
+        },
+        {
+          "file": "generate-vocab-embeddings.yml",
+          "purpose": "Creates vector embeddings for vocabulary items to find similar words"
+        },
+        {
+          "file": "backfill-relationships.yml",
+          "purpose": "Uses AI to discover and create relationships between vocabulary items"
+        },
+        {
+          "file": "generate-graded-reading-cache.yml",
+          "purpose": "Generates level-appropriate reading articles with comprehension questions"
+        },
+        {
+          "file": "youtube_ingest.yml",
+          "purpose": "Discovers and imports Chinese-learning YouTube content"
+        },
+        {
+          "file": "bilibili_ingest.yml",
+          "purpose": "Imports content from Bilibili (Chinese video platform)"
+        },
+        {
+          "file": "pgc_maintenance.yml",
+          "purpose": "Maintains and cleans up community-generated content"
+        },
+        {
+          "file": "qc-cached-questions.yml",
+          "purpose": "Quality control checks on pre-generated quiz questions"
+        },
+        {
+          "file": "push-to-supabase.yml",
+          "purpose": "Deploys edge functions to Supabase"
+        },
+        {
+          "file": "sync-supabase-schema.yml",
+          "purpose": "Synchronizes database schema across environments"
+        }
+      ]
+    },
+    "Cloudflare_R2": {
+      "what": "An S3-compatible object storage service from Cloudflare. Cheaper than AWS S3 with no egress fees.",
+      "used_for": "Storing generated quiz images (DALL-E topic images, etc.)",
+      "key_concepts": [
+        "Object storage - files stored as objects with keys (paths) in buckets",
+        "S3-compatible API - uses the same interface as Amazon S3",
+        "Bucket - a container for stored objects",
+        "PutObject / DeleteObject / HeadObject - core operations for uploading, deleting, and checking files"
+      ]
+    },
+    "Vercel": {
+      "what": "A deployment platform optimized for Next.js. Handles building, hosting, and serving the web apps.",
+      "used_for": "Hosting the learner and partner Next.js applications"
+    }
+  },
+
+  "libraries_by_category": {
+    "UI_component_libraries": {
+      "Radix_UI": {
+        "what": "Unstyled, accessible React component primitives. You get correct behavior (keyboard navigation, ARIA attributes) and apply your own styling.",
+        "packages_used": [
+          "@radix-ui/react-accordion",
+          "@radix-ui/react-alert-dialog",
+          "@radix-ui/react-dialog",
+          "@radix-ui/react-dropdown-menu",
+          "@radix-ui/react-icons",
+          "@radix-ui/react-label",
+          "@radix-ui/react-popover",
+          "@radix-ui/react-progress",
+          "@radix-ui/react-separator",
+          "@radix-ui/react-slider",
+          "@radix-ui/react-slot",
+          "@radix-ui/react-switch",
+          "@radix-ui/react-tooltip"
+        ]
+      },
+      "shadcn_ui": {
+        "what": "Not a library you install - it's a collection of copy-pasteable React components built on Radix UI + Tailwind. You own the code in your project.",
+        "used_for": "The base component library (buttons, dialogs, dropdowns, etc.)"
+      },
+      "lucide_react": {
+        "what": "An icon library providing clean SVG icons as React components.",
+        "version": "0.541.0"
+      },
+      "cmdk": {
+        "what": "A command palette/menu component (like Cmd+K search). Fast, composable, accessible."
+      }
+    },
+    "styling": {
+      "Tailwind_CSS": {
+        "what": "A utility-first CSS framework. Instead of writing CSS classes, you compose styles from small utility classes directly in your HTML/JSX.",
+        "version": "3.4.17",
+        "example": "className='bg-blue-500 text-white p-4 rounded-lg hover:bg-blue-600'",
+        "key_concepts": [
+          "Utility classes - single-purpose classes like p-4 (padding), text-white, flex, etc.",
+          "Responsive prefixes - md:flex-row means 'apply flex-row at medium screens and up'",
+          "Dark mode - dark:bg-gray-900 applies only when dark mode is active",
+          "Custom theme - extending default values in tailwind.config.ts",
+          "@apply - using Tailwind classes inside traditional CSS (used sparingly)"
+        ]
+      },
+      "tailwindcss_animate": {
+        "what": "A Tailwind plugin adding animation utility classes (fade-in, slide-out, etc.)."
+      },
+      "class_variance_authority": {
+        "what": "A library for building component variant APIs. Lets you define style variants (size: 'sm' | 'md' | 'lg') that map to Tailwind classes."
+      },
+      "clsx": {
+        "what": "A tiny utility for conditionally joining className strings. Example: clsx('base', isActive && 'active')"
+      },
+      "tailwind_merge": {
+        "what": "Merges Tailwind classes intelligently so that conflicting classes resolve correctly (e.g., p-4 + p-2 = p-2, not both)."
+      },
+      "PostCSS": {
+        "what": "A CSS processing tool. Tailwind uses it as a plugin to generate the final CSS.",
+        "version": "8.5.6"
+      },
+      "Autoprefixer": {
+        "what": "A PostCSS plugin that adds vendor prefixes (-webkit-, -moz-) to CSS for browser compatibility.",
+        "version": "10.4.21"
+      }
+    },
+    "internationalization": {
+      "next_intl": {
+        "what": "An internationalization (i18n) library for Next.js. Handles translations, locale routing, and date/number formatting.",
+        "version": "4.7.0",
+        "key_concepts": [
+          "Locale - a language+region code like en-US, zh-CN, fr-FR",
+          "useTranslations() hook - fetches translated strings in components",
+          "[locale] dynamic segment - URL parameter for the current language",
+          "Translation files - JSON files mapping keys to translated strings"
+        ]
+      }
+    },
+    "theming": {
+      "next_themes": {
+        "what": "A Next.js library for managing light/dark mode themes with system preference detection.",
+        "version": "0.4.6"
+      }
+    },
+    "database_clients": {
+      "supabase_js": {
+        "what": "The official JavaScript client for Supabase. Provides methods for auth, database queries, storage, and real-time subscriptions.",
+        "versions": ["2.45.4", "2.47.0"],
+        "related_packages": [
+          "@supabase/auth-helpers-nextjs - SSR-compatible auth helpers for Next.js",
+          "@supabase/ssr - server-side rendering support for Supabase auth"
+        ]
+      },
+      "supabase_python": {
+        "what": "The official Python client for Supabase. Used in data processing scripts."
+      }
+    },
+    "AI_and_ML": {
+      "OpenAI_SDK": {
+        "what": "Client libraries (JavaScript and Python) for calling OpenAI's API.",
+        "capabilities_used": [
+          "Chat completions (gpt-5-mini) - generating quiz questions, article text, enrichment",
+          "Embeddings - converting text into numerical vectors for similarity comparison",
+          "DALL-E image generation - creating topic illustration images",
+          "Whisper speech-to-text - transcribing audio in the Lens feature",
+          "GPT-4o vision - reading text from camera images in the Goggles feature"
+        ],
+        "key_concepts": [
+          "API key - secret token for authenticating with OpenAI",
+          "Prompt engineering - crafting instructions to get desired output from LLMs",
+          "System message vs user message - roles in a chat completion request",
+          "JSON mode - forcing the model to output valid JSON",
+          "Temperature - controls randomness (0 = deterministic, 1 = creative)",
+          "Tokens - the units LLMs process text in (roughly 4 characters per token)",
+          "Embeddings - dense vector representations of text for similarity search"
+        ]
+      },
+      "Qwen_API": {
+        "what": "An alternative LLM API (from Alibaba) used for content enrichment tasks, likely for cost or Chinese-language quality reasons."
+      },
+      "scikit_learn": {
+        "what": "A Python machine learning library. Used here specifically for cosine_similarity to compare embedding vectors.",
+        "function_used": "sklearn.metrics.pairwise.cosine_similarity"
+      }
+    },
+    "data_processing_python": {
+      "pandas": {
+        "what": "Python's primary data manipulation library. DataFrames are like spreadsheets in code - rows and columns you can filter, group, merge, and transform."
+      },
+      "numpy": {
+        "what": "Python's numerical computing library. Provides efficient array operations. Foundation for pandas and scikit-learn."
+      },
+      "jieba": {
+        "what": "A Chinese text segmentation library. Chinese text has no spaces between words, so jieba identifies word boundaries."
+      },
+      "pdfplumber": {
+        "what": "A Python library for extracting text and tables from PDF files."
+      },
+      "beautifulsoup4": {
+        "what": "A Python library for parsing HTML and XML documents. Used to scrape and extract data from web pages."
+      },
+      "requests": {
+        "what": "A simple Python HTTP library for making web requests (GET, POST, etc.)."
+      },
+      "psycopg2_binary": {
+        "what": "A PostgreSQL database adapter for Python. Allows direct SQL queries from Python code."
+      },
+      "pyairtable": {
+        "what": "A Python client for Airtable's API. Airtable is a spreadsheet-database hybrid used for content management."
+      }
+    },
+    "cloud_storage": {
+      "AWS_SDK_S3": {
+        "what": "Amazon's official SDK for S3 storage. Used here to talk to Cloudflare R2 (which is S3-compatible).",
+        "package": "@aws-sdk/client-s3",
+        "commands_used": ["PutObjectCommand", "DeleteObjectCommand", "HeadObjectCommand"]
+      }
+    },
+    "external_APIs": {
+      "Google_YouTube_API": {
+        "what": "Google's API for YouTube data. Used to search for videos, fetch metadata, and retrieve captions/transcripts.",
+        "package": "googleapis v132.0.0",
+        "operations": ["Video search with hashtag filtering", "Caption/transcript fetching", "Channel metadata"]
+      }
+    },
+    "analytics": {
+      "Vercel_Analytics": {
+        "what": "Lightweight analytics for Vercel-hosted apps. Tracks page views and web vitals.",
+        "package": "@vercel/analytics v1.6.1"
+      }
+    }
+  },
+
+  "dev_tools": {
+    "Node.js": {
+      "what": "A JavaScript runtime built on Chrome's V8 engine. Lets you run JavaScript outside a browser. Required for Next.js, npm, and build tools.",
+      "version": "20+"
+    },
+    "npm": {
+      "what": "Node Package Manager. Installs JavaScript libraries, runs project scripts, and manages dependencies.",
+      "key_files": [
+        "package.json - lists project dependencies, scripts, and metadata",
+        "package-lock.json - locks exact dependency versions for reproducible installs"
+      ],
+      "key_commands": [
+        "npm install - installs all dependencies listed in package.json",
+        "npm run dev - starts the development server",
+        "npm run build - creates a production build",
+        "npm run lint - checks code for style/quality issues"
+      ]
+    },
+    "npx": {
+      "what": "Executes npm packages without installing them globally. Often used for one-off commands."
+    },
+    "tsx": {
+      "what": "A tool that runs TypeScript files directly without a separate compile step. Used for utility scripts."
+    },
+    "Git": {
+      "what": "A distributed version control system. Tracks every change to your code, enables branching, merging, and collaboration.",
+      "key_commands": [
+        "git clone - downloads a repository to your local machine",
+        "git checkout -b branch-name - creates and switches to a new branch",
+        "git add file.ts - stages a file for committing",
+        "git commit -m 'message' - saves staged changes with a description",
+        "git push -u origin branch-name - uploads your branch to GitHub",
+        "git pull origin main - downloads and merges latest changes from main",
+        "git status - shows which files are modified, staged, or untracked",
+        "git diff - shows the actual line-by-line changes",
+        "git log - shows commit history",
+        "git merge - combines one branch into another",
+        "git fetch - downloads remote changes without merging them"
+      ]
+    },
+    "TypeScript_Compiler": {
+      "what": "The tsc command that checks types and compiles TypeScript to JavaScript.",
+      "version": "5.5.4",
+      "config_file": "tsconfig.json"
+    },
+    "ESLint": {
+      "what": "A static analysis tool that finds and fixes problems in JavaScript/TypeScript code. Enforces coding style rules.",
+      "version": "8.57.1",
+      "config": "eslint-config-next - Next.js-specific ESLint rules"
+    },
+    "Supabase_CLI": {
+      "what": "Command-line tool for local Supabase development. Runs a local PostgreSQL instance, applies migrations, and deploys edge functions."
+    }
+  },
+
+  "architectural_patterns": {
+    "Serverless_Architecture": {
+      "what": "Instead of running a constantly-on server, code runs as individual functions triggered by HTTP requests. Each function scales independently and you only pay for execution time.",
+      "where": "All 40+ Supabase edge functions"
+    },
+    "Monorepo": {
+      "what": "A single Git repository containing multiple related projects (apps/learner, apps/partner). npm workspaces link them together so they can share code.",
+      "structure": "apps/learner + apps/partner + shared config"
+    },
+    "Server_Side_Rendering": {
+      "what": "The server generates the full HTML for a page before sending it to the browser. Improves initial load time and SEO compared to client-side rendering.",
+      "where": "Next.js pages and server components"
+    },
+    "API_Routes": {
+      "what": "Backend HTTP endpoints defined as files within your Next.js project. No separate server needed.",
+      "where": "Next.js API route files"
+    },
+    "Edge_Functions": {
+      "what": "Serverless functions deployed to a CDN's edge network (close to users geographically). Low latency, auto-scaling.",
+      "where": "All supabase/functions/* directories"
+    },
+    "File_Based_Routing": {
+      "what": "Your folder structure directly maps to URL paths. A file at app/quiz/page.tsx serves the /quiz URL. No separate router configuration needed.",
+      "where": "Next.js App Router"
+    },
+    "Trie_Based_Tokenization": {
+      "what": "A tree data structure where each node represents a character. Used for efficient longest-match-first text segmentation - given a sentence, find all known vocabulary words within it.",
+      "where": "_shared/tokenize.ts - core to the Lens feature"
+    },
+    "Feedback_Loop_Pattern": {
+      "what": "A cycle where system output is measured and fed back in to improve future output. Quiz distractors are tracked for how often users select them, and this data promotes good distractors and demotes bad ones.",
+      "where": "Distractor effectiveness tracking across quiz modes"
+    },
+    "Cursor_Based_Resumption": {
+      "what": "Batch processing that tracks where it left off. If a job fails partway through, it can resume from the last successful item instead of starting over.",
+      "where": "Python data processing scripts and embedding generation"
+    },
+    "Pre_Generation_Caching": {
+      "what": "Generating content ahead of time (quiz questions, articles) and storing it in the database, so users get instant responses instead of waiting for AI generation.",
+      "where": "cached_placement_questions, cached_graded_reading_articles tables"
+    }
+  },
+
+  "authentication_and_security": {
+    "concepts": [
+      {
+        "term": "JWT (JSON Web Token)",
+        "what": "A compact token format used for authentication. Contains encoded user info and is signed to prevent tampering. Sent with each API request to prove identity."
+      },
+      {
+        "term": "OAuth",
+        "what": "A protocol that lets users log in via third-party providers (Google, Facebook) without sharing their password with your app."
+      },
+      {
+        "term": "Row Level Security (RLS)",
+        "what": "PostgreSQL feature that adds WHERE clauses to every query automatically based on the current user. Ensures users can only see/modify their own data at the database level."
+      },
+      {
+        "term": "Service Role Key",
+        "what": "A secret key that bypasses RLS. Used only by backend/admin code, never exposed to the client."
+      },
+      {
+        "term": "CORS (Cross-Origin Resource Sharing)",
+        "what": "Browser security that blocks requests to different domains unless the server explicitly allows it via HTTP headers."
+      },
+      {
+        "term": "Environment Variables / Secrets",
+        "what": "Configuration values (API keys, database URLs) stored outside the code. In GitHub Actions, stored as encrypted 'Secrets'."
+      }
+    ]
+  },
+
+  "database_schema_concepts": {
+    "tables": {
+      "core_content": {
+        "vocab": "Individual vocabulary items with phrase, meaning, level, language",
+        "grammar": "Grammar patterns with rules, examples, and difficulty levels"
+      },
+      "user_progress": {
+        "user_vocab": "Tracks each user's mastery of each vocabulary item (confidence score, review dates)",
+        "user_grammar": "Same as user_vocab but for grammar patterns"
+      },
+      "relationships": {
+        "related_vocab": "Links between vocabulary items (synonym, antonym, confusable, collocation, same_radical, same_sound)",
+        "vocab_grammar": "Links vocabulary to relevant grammar patterns",
+        "vocab_topics": "Categorizes vocabulary into topic areas"
+      },
+      "analytics": {
+        "relationship_usage": "Logs every time a vocabulary relationship is used as a quiz distractor and whether the user selected it",
+        "content_exposure": "Tracks what content users have seen for spaced repetition"
+      },
+      "cached_content": {
+        "cached_placement_questions": "Pre-generated placement test questions",
+        "cached_graded_reading_articles": "Pre-generated reading articles at various levels"
+      },
+      "community_content": {
+        "raw_posts": "Ingested social media posts (YouTube, Bilibili)",
+        "pgc_enriched_posts": "Posts after AI enrichment with vocabulary tagging",
+        "raw_post_transcripts_simple": "Simplified transcripts from video content",
+        "contributors": "Content creator profiles"
+      },
+      "lens_feature": {
+        "lens_sessions": "Records of Lens (subtitles/goggles) usage sessions",
+        "lens_confidence_boost": "Confidence increases from passive Lens encounters"
+      }
+    },
+    "key_patterns": [
+      "UUID primary keys - every table uses UUIDs instead of auto-incrementing integers for global uniqueness",
+      "Timestamp columns - created_at and updated_at on most tables for audit trails",
+      "Soft deletes - some tables use an is_active flag instead of actually deleting rows",
+      "Junction tables - many-to-many relationships via intermediate tables (vocab_topics links vocab to topics)",
+      "JSONB for flexibility - columns like metadata store variable-structure data"
+    ]
+  },
+
+  "project_specific_domain_concepts": {
+    "ZPD": {
+      "full_name": "Zone of Proximal Development",
+      "what": "Educational theory: learning is most effective when material is just beyond the learner's current ability. Not too easy (boring), not too hard (frustrating). The system uses this to select which vocabulary and grammar to present."
+    },
+    "Spaced_Repetition": {
+      "what": "A learning technique where items are reviewed at increasing intervals. Items you struggle with appear more often; items you know well appear less often. Driven by confidence scores in user_vocab/user_grammar."
+    },
+    "Smart_Distractors": {
+      "what": "Wrong answers in multiple-choice questions that are chosen intelligently. Instead of random wrong answers, the system uses related words (confusables, synonyms, antonyms) that a real learner might confuse. The effectiveness of each distractor is tracked and optimized over time.",
+      "ideal_selection_rate": "15-45% - a good distractor fools some learners but not too many"
+    },
+    "Placement_Testing": {
+      "what": "A multi-stage test given to new users to determine their starting level. Uses adaptive difficulty - correct answers lead to harder questions."
+    },
+    "Tokenization": {
+      "what": "Breaking text into meaningful units (tokens). For Chinese, this means identifying word boundaries since there are no spaces. The project uses a Trie data structure to match known vocabulary against input text."
+    },
+    "Embeddings": {
+      "what": "Converting text into numerical vectors (arrays of numbers) where similar meanings are close together in vector space. Used to find vocabulary items that are semantically similar."
+    },
+    "Content_Pipeline": {
+      "what": "The process of ingesting raw content (YouTube videos, social media posts), enriching it with AI (vocabulary tagging, difficulty assessment), and serving it to learners at appropriate levels."
+    }
+  },
+
+  "configuration_files_reference": {
+    "files": [
+      {
+        "file": "package.json",
+        "what": "Lists npm dependencies, project scripts (dev, build, lint), and project metadata. The central manifest for a Node.js project."
+      },
+      {
+        "file": "package-lock.json",
+        "what": "Auto-generated file locking exact dependency versions. Ensures everyone installs identical packages."
+      },
+      {
+        "file": "tsconfig.json",
+        "what": "TypeScript compiler configuration: which files to compile, how strict to be, what module system to target."
+      },
+      {
+        "file": "next.config.mjs",
+        "what": "Next.js build and runtime configuration: image domains, redirects, webpack overrides."
+      },
+      {
+        "file": "tailwind.config.ts",
+        "what": "Tailwind CSS theme customization: colors, fonts, breakpoints, plugins."
+      },
+      {
+        "file": "capacitor.config.ts",
+        "what": "Capacitor mobile wrapper configuration: app ID, server URL, plugin settings."
+      },
+      {
+        "file": "supabase/config.toml",
+        "what": "Supabase local development settings: database port, auth configuration, edge function settings."
+      },
+      {
+        "file": ".github/workflows/*.yml",
+        "what": "GitHub Actions workflow definitions in YAML. Each file defines triggers, jobs, steps, and environment variables for automated tasks."
+      },
+      {
+        "file": ".env / .env.local",
+        "what": "Environment variable files (not committed to Git). Store secrets like API keys locally."
+      }
+    ]
+  },
+
+  "learning_path_suggestion": {
+    "description": "Suggested order for teaching these concepts to a complete beginner, building from fundamentals to project-specific knowledge.",
+    "phases": [
+      {
+        "phase": 1,
+        "title": "Foundations",
+        "topics": [
+          "What is programming and how computers execute code",
+          "HTML and CSS basics - how web pages are structured and styled",
+          "JavaScript fundamentals - variables, functions, loops, objects, arrays",
+          "The browser and the DOM - how JavaScript interacts with web pages",
+          "Git basics - version control, commits, branches",
+          "Command line / terminal basics",
+          "What is an API and HTTP requests"
+        ]
+      },
+      {
+        "phase": 2,
+        "title": "Core Web Development",
+        "topics": [
+          "TypeScript - types, interfaces, generics",
+          "React - components, props, state, hooks, JSX",
+          "CSS frameworks - Tailwind utility classes",
+          "Node.js and npm - the JavaScript ecosystem",
+          "Async programming - Promises, async/await, fetch"
+        ]
+      },
+      {
+        "phase": 3,
+        "title": "Full-Stack Concepts",
+        "topics": [
+          "SQL and relational databases - tables, queries, joins",
+          "PostgreSQL specifics - JSONB, extensions, functions",
+          "Authentication - JWT, OAuth, sessions",
+          "Next.js - SSR, routing, API routes, server components",
+          "REST APIs - designing and consuming endpoints"
+        ]
+      },
+      {
+        "phase": 4,
+        "title": "Infrastructure & DevOps",
+        "topics": [
+          "Supabase - managed backend, edge functions, RLS",
+          "Serverless architecture - functions as a service",
+          "GitHub Actions - CI/CD, workflow automation",
+          "Environment variables and secrets management",
+          "Cloud storage - S3/R2 object storage"
+        ]
+      },
+      {
+        "phase": 5,
+        "title": "AI & Data Processing",
+        "topics": [
+          "Python fundamentals for scripting",
+          "LLM APIs - prompts, completions, tokens, temperature",
+          "Embeddings and vector similarity",
+          "Data processing with pandas and numpy",
+          "Batch processing patterns and idempotency"
+        ]
+      },
+      {
+        "phase": 6,
+        "title": "Project-Specific Patterns",
+        "topics": [
+          "ZPD and adaptive learning algorithms",
+          "Smart distractor feedback loop",
+          "Trie-based tokenization for CJK languages",
+          "Content pipeline: ingestion, enrichment, serving",
+          "Mobile packaging with Capacitor",
+          "Internationalization with next-intl"
+        ]
+      }
+    ]
+  }
+}
+
