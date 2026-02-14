@@ -3,7 +3,7 @@ import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const txtPath = join(__dirname, "..", "..", "subject-matter.txt");
+const txtPath = join(__dirname, "..", "subject-matter.txt");
 const outPath = join(__dirname, "..", "lib", "items.ts");
 
 // --- Read and split the txt file into 3 JSON blocks ---
