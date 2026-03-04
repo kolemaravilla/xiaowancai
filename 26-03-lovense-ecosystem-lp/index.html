@@ -499,6 +499,7 @@
     const exploreText = document.getElementById('exploreText');
     const scrollHint = document.getElementById('scrollHint');
     const banner = document.getElementById('banner');
+    const quizSection = document.getElementById('quizSection');
     const quizCard = document.getElementById('quizCard');
     const quizPagination = document.getElementById('quizPagination');
     const vh = window.innerHeight;
@@ -554,33 +555,22 @@
       // ── Scroll hint fade-out ──
       scrollHint.style.opacity = Math.max(0, 1 - scrollY / (vh * 0.5));
 
-      // ── Phase 3: Banner fades to black as quiz slides over ──
-      const bannerFadeStart = vh * 3.8;
-      const bannerFadeEnd = vh * 4.8;
-      const bannerFadeProgress = (scrollY - bannerFadeStart) / (bannerFadeEnd - bannerFadeStart);
-      banner.style.opacity = 1 - Math.max(0, Math.min(1, bannerFadeProgress));
+      // ── Phase 3: Banner fade-out / Quiz fade-in ──
+      // Use quiz section's actual position to drive both transitions
+      const quizTop = quizSection.getBoundingClientRect().top;
+      const overlap = Math.max(0, Math.min(1, 1 - quizTop / vh));
+
+      // Banner fades out as quiz slides over
+      banner.style.opacity = 1 - overlap;
+
+      // Quiz card and pagination fade in
+      quizCard.style.opacity = overlap;
+      quizCard.style.transform = `translateY(${lerp(30, 0, overlap)}px)`;
+
+      const pagProgress = Math.max(0, (overlap - 0.3) / 0.7);
+      quizPagination.style.opacity = pagProgress;
+      quizPagination.style.transform = `translateY(${lerp(20, 0, pagProgress)}px)`;
     }
-
-    // ── Quiz section fade-in on scroll into view ──
-    const quizObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const ratio = entry.intersectionRatio;
-          const easedRatio = Math.min(1, ratio * 2.5);
-
-          quizCard.style.opacity = easedRatio;
-          quizCard.style.transform = `translateY(${lerp(30, 0, easedRatio)}px)`;
-
-          quizPagination.style.opacity = Math.max(0, (easedRatio - 0.3) / 0.7);
-          quizPagination.style.transform = `translateY(${lerp(20, 0, Math.max(0, (easedRatio - 0.3) / 0.7))}px)`;
-        }
-      });
-    }, {
-      threshold: Array.from({ length: 20 }, (_, i) => i / 19),
-      rootMargin: '0px'
-    });
-
-    quizObserver.observe(document.getElementById('quizSection'));
 
     // ── Listen ──
     window.addEventListener('scroll', updateCarousel, { passive: true });
