@@ -498,6 +498,7 @@
     const items = document.querySelectorAll('.carousel-item');
     const exploreText = document.getElementById('exploreText');
     const scrollHint = document.getElementById('scrollHint');
+    const banner = document.getElementById('banner');
     const quizCard = document.getElementById('quizCard');
     const quizPagination = document.getElementById('quizPagination');
     const vh = window.innerHeight;
@@ -552,6 +553,12 @@
 
       // ── Scroll hint fade-out ──
       scrollHint.style.opacity = Math.max(0, 1 - scrollY / (vh * 0.5));
+
+      // ── Phase 3: Banner fades to black as quiz slides over ──
+      const bannerFadeStart = vh * 3.8;
+      const bannerFadeEnd = vh * 4.8;
+      const bannerFadeProgress = (scrollY - bannerFadeStart) / (bannerFadeEnd - bannerFadeStart);
+      banner.style.opacity = 1 - Math.max(0, Math.min(1, bannerFadeProgress));
     }
 
     // ── Quiz section fade-in on scroll into view ──
