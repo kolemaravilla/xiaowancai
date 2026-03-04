@@ -167,7 +167,7 @@
       left: 50%;
       transform: translateX(-50%);
       font-size: clamp(1rem, 2.2vw, 1.4rem);
-      font-weight: 300;
+      font-weight: 700;
       color: var(--lovense-pink);
       text-align: center;
       opacity: 0;
@@ -499,13 +499,17 @@
     const quizMenuBar = document.getElementById('quizMenuBar');
     const quizCard = document.getElementById('quizCard');
     const quizPagination = document.getElementById('quizPagination');
+    const scrollSpacer = document.getElementById('scrollSpacer');
     const vh = window.innerHeight;
 
     // Scroll phase boundaries (in px)
     const ROTATION_START = 0;
     const ROTATION_END = vh * 3;        // 0→3vh: one full 360° rotation
+
+    // Set spacer so quiz first pixel enters viewport exactly at ROTATION_END
+    scrollSpacer.style.height = (ROTATION_END + vh) + 'px';
     const EXPLORE_START = vh * 2.4;       // Extension icon reaches front (288°)
-    const EXPLORE_END = vh * 3;           // fully visible by end of rotation
+    const EXPLORE_END = vh * 2.8;         // fully visible before quiz arrives
 
     function lerp(a, b, t) {
       return a + (b - a) * Math.max(0, Math.min(1, t));
