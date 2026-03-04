@@ -289,8 +289,6 @@
       width: 100%;
       text-align: center;
       box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
-      opacity: 0;
-      transform: translateY(30px);
     }
 
     .quiz-card h3 {
@@ -333,8 +331,6 @@
       margin-top: 2rem;
       align-items: center;
       justify-content: center;
-      opacity: 0;
-      transform: translateY(20px);
     }
 
     .page-dot {
@@ -556,18 +552,20 @@
       scrollHint.style.opacity = Math.max(0, 1 - scrollY / (vh * 0.5));
 
       // ── Phase 3: Banner fade-out / Quiz fade-in ──
-      // Use quiz section's actual position to drive both transitions
       const quizTop = quizSection.getBoundingClientRect().top;
       const overlap = Math.max(0, Math.min(1, 1 - quizTop / vh));
 
-      // Banner fades out as quiz slides over
-      banner.style.opacity = 1 - overlap;
+      // Banner fades out fast (gone by halfway)
+      banner.style.opacity = Math.max(0, 1 - overlap * 2);
 
-      // Quiz card and pagination fade in
-      quizCard.style.opacity = overlap;
-      quizCard.style.transform = `translateY(${lerp(30, 0, overlap)}px)`;
+      // Quiz card fades in based on its own position in viewport
+      const cardRect = quizCard.getBoundingClientRect();
+      const cardProgress = Math.max(0, Math.min(1, 1 - cardRect.top / vh));
 
-      const pagProgress = Math.max(0, (overlap - 0.3) / 0.7);
+      quizCard.style.opacity = cardProgress;
+      quizCard.style.transform = `translateY(${lerp(30, 0, cardProgress)}px)`;
+
+      const pagProgress = Math.max(0, (cardProgress - 0.3) / 0.7);
       quizPagination.style.opacity = pagProgress;
       quizPagination.style.transform = `translateY(${lerp(20, 0, pagProgress)}px)`;
     }
