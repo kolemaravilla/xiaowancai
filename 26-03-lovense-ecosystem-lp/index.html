@@ -559,24 +559,23 @@
       // Banner fades out fast (gone by halfway)
       banner.style.opacity = Math.max(0, 1 - overlap * 2);
 
-      // Ease-in curve: elements stay nearly invisible at the viewport
-      // edge and ramp up as they move further in
-      function easeIn(t) { return t * t * t; }
+      // Delayed fade: invisible for first 15%, fully opaque by 75%
+      function fade(t) { return Math.max(0, Math.min(1, (t - 0.15) / 0.6)); }
 
       // Menu bar (title/description) fades in with the section
-      const menuFade = easeIn(overlap);
+      const menuFade = fade(overlap);
       quizMenuBar.style.opacity = menuFade;
       quizMenuBar.style.transform = `translateY(${lerp(20, 0, menuFade)}px)`;
 
       // Quiz card fades in based on its own position in viewport
       const cardRect = quizCard.getBoundingClientRect();
       const cardRaw = Math.max(0, Math.min(1, 1 - cardRect.top / vh));
-      const cardFade = easeIn(cardRaw);
+      const cardFade = fade(cardRaw);
 
       quizCard.style.opacity = cardFade;
       quizCard.style.transform = `translateY(${lerp(30, 0, cardFade)}px)`;
 
-      const pagFade = easeIn(Math.max(0, (cardRaw - 0.3) / 0.7));
+      const pagFade = fade(Math.max(0, (cardRaw - 0.3) / 0.7));
       quizPagination.style.opacity = pagFade;
       quizPagination.style.transform = `translateY(${lerp(20, 0, pagFade)}px)`;
     }
