@@ -212,7 +212,7 @@
 
     /* ─── SCROLL SPACER ─── */
     .scroll-spacer {
-      height: 500vh;
+      height: 400vh;
       position: relative;
       z-index: 0;
       pointer-events: none;
@@ -504,8 +504,8 @@
     // Scroll phase boundaries (in px)
     const ROTATION_START = 0;
     const ROTATION_END = vh * 3;        // 0→3vh: one full 360° rotation
-    const EXPLORE_START = vh * 3;
-    const EXPLORE_END = vh * 4;          // 3→4vh: explore text fades in
+    const EXPLORE_START = vh * 2.4;       // Extension icon reaches front (288°)
+    const EXPLORE_END = vh * 3;           // fully visible by end of rotation
 
     function lerp(a, b, t) {
       return a + (b - a) * Math.max(0, Math.min(1, t));
