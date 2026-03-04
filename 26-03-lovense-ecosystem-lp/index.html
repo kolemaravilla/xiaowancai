@@ -496,6 +496,7 @@
     const scrollHint = document.getElementById('scrollHint');
     const banner = document.getElementById('banner');
     const quizSection = document.getElementById('quizSection');
+    const quizMenuBar = document.getElementById('quizMenuBar');
     const quizCard = document.getElementById('quizCard');
     const quizPagination = document.getElementById('quizPagination');
     const vh = window.innerHeight;
@@ -557,6 +558,10 @@
 
       // Banner fades out fast (gone by halfway)
       banner.style.opacity = Math.max(0, 1 - overlap * 2);
+
+      // Menu bar (title/description) fades in with the section
+      quizMenuBar.style.opacity = overlap;
+      quizMenuBar.style.transform = `translateY(${lerp(20, 0, overlap)}px)`;
 
       // Quiz card fades in based on its own position in viewport
       const cardRect = quizCard.getBoundingClientRect();
