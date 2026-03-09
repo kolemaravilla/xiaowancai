@@ -515,6 +515,40 @@
       targetSpeed = BASE_SPEED;
     });
 
+    // ── Touch: swipe to spin ──
+    let touchStartX = 0;
+    let touchLastX = 0;
+    let touchLastTime = 0;
+    let isTouching = false;
+
+    banner.addEventListener('touchstart', (e) => {
+      const t = e.touches[0];
+      touchStartX = t.clientX;
+      touchLastX = t.clientX;
+      touchLastTime = performance.now();
+      isTouching = true;
+    }, { passive: true });
+
+    banner.addEventListener('touchmove', (e) => {
+      if (!isTouching) return;
+      const t = e.touches[0];
+      const now = performance.now();
+      const dx = t.clientX - touchLastX;
+      const dt = Math.max(1, now - touchLastTime) / 1000;
+
+      // Convert px/s to degrees/s (scale factor tunes sensitivity)
+      const swipeSpeed = (dx / dt) * 0.3;
+      targetSpeed = swipeSpeed;
+
+      touchLastX = t.clientX;
+      touchLastTime = now;
+    }, { passive: true });
+
+    banner.addEventListener('touchend', () => {
+      isTouching = false;
+      targetSpeed = BASE_SPEED;
+    });
+
     function lerp(a, b, t) {
       return a + (b - a) * Math.max(0, Math.min(1, t));
     }
