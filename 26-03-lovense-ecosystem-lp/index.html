@@ -537,7 +537,7 @@
       const dt = Math.max(1, now - touchLastTime) / 1000;
 
       // Convert px/s to degrees/s (scale factor tunes sensitivity)
-      const swipeSpeed = (dx / dt) * 0.3;
+      const swipeSpeed = -(dx / dt) * 0.3;
       targetSpeed = swipeSpeed;
 
       touchLastX = t.clientX;
