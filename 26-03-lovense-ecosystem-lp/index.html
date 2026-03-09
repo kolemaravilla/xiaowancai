@@ -170,7 +170,7 @@
       font-weight: 700;
       color: var(--lovense-pink);
       text-align: center;
-      opacity: 0;
+      opacity: 1;
       letter-spacing: 0.04em;
       max-width: 480px;
       padding: 0 1rem;
@@ -210,18 +210,13 @@
       50% { transform: rotate(45deg) translateY(6px); }
     }
 
-    /* ─── SCROLL SPACER ─── */
-    .scroll-spacer {
-      height: 400vh;
-      position: relative;
-      z-index: 0;
-      pointer-events: none;
-    }
+
 
     /* ─── QUIZ SECTION (slides over banner) ─── */
     .quiz-section {
       position: relative;
       z-index: 10;
+      margin-top: 100vh; /* push below the fixed banner */
       background: linear-gradient(180deg, #FFDCDF 0%, #FFF9F5 100%);
       min-height: 100vh;
       display: flex;
@@ -461,9 +456,6 @@
     </div>
   </section>
 
-  <!-- ═══ SCROLL SPACER (drives the rotation via scroll) ═══ -->
-  <div class="scroll-spacer" id="scrollSpacer"></div>
-
   <!-- ═══ QUIZ SECTION (slides over the banner) ═══ -->
   <section class="quiz-section" id="quizSection">
     <div class="quiz-menu-bar" id="quizMenuBar">
@@ -492,38 +484,79 @@
   <script>
     const carousel = document.getElementById('carousel');
     const items = document.querySelectorAll('.carousel-item');
-    const exploreText = document.getElementById('exploreText');
     const scrollHint = document.getElementById('scrollHint');
     const banner = document.getElementById('banner');
     const quizSection = document.getElementById('quizSection');
     const quizMenuBar = document.getElementById('quizMenuBar');
     const quizCard = document.getElementById('quizCard');
     const quizPagination = document.getElementById('quizPagination');
-    const scrollSpacer = document.getElementById('scrollSpacer');
     const vh = window.innerHeight;
 
-    // Scroll phase boundaries (in px)
-    const ROTATION_START = 0;
-    const ROTATION_END = vh * 3;        // 0→3vh: one full 360° rotation
+    // ── Auto-rotation state ──
+    const BASE_SPEED = 12;           // degrees per second (idle)
+    const HOVER_SPEED = 60;          // degrees per second (hover)
+    let rotationDeg = 0;
+    let currentSpeed = BASE_SPEED;   // positive = clockwise
+    let targetSpeed = BASE_SPEED;
+    let lastTime = performance.now();
 
-    // Set spacer so quiz first pixel enters viewport exactly at ROTATION_END
-    scrollSpacer.style.height = (ROTATION_END + vh) + 'px';
-    const EXPLORE_START = vh * 2.4;       // Extension icon reaches front (288°)
-    const EXPLORE_END = vh * 2.8;         // fully visible before quiz arrives
+    // ── Hover: left half → faster left, right half → faster right ──
+    banner.addEventListener('mousemove', (e) => {
+      const rect = banner.getBoundingClientRect();
+      const xRatio = (e.clientX - rect.left) / rect.width; // 0–1
+      if (xRatio < 0.5) {
+        targetSpeed = -HOVER_SPEED;   // counter-clockwise
+      } else {
+        targetSpeed = HOVER_SPEED;    // clockwise
+      }
+    });
+
+    banner.addEventListener('mouseleave', () => {
+      targetSpeed = BASE_SPEED;
+    });
+
+    // ── Touch: swipe to spin ──
+    let touchStartX = 0;
+    let touchLastX = 0;
+    let touchLastTime = 0;
+    let isTouching = false;
+
+    banner.addEventListener('touchstart', (e) => {
+      const t = e.touches[0];
+      touchStartX = t.clientX;
+      touchLastX = t.clientX;
+      touchLastTime = performance.now();
+      isTouching = true;
+    }, { passive: true });
+
+    banner.addEventListener('touchmove', (e) => {
+      if (!isTouching) return;
+      const t = e.touches[0];
+      const now = performance.now();
+      const dx = t.clientX - touchLastX;
+      const dt = Math.max(1, now - touchLastTime) / 1000;
+
+      // Convert px/s to degrees/s (scale factor tunes sensitivity)
+      const swipeSpeed = -(dx / dt) * 0.3;
+      targetSpeed = swipeSpeed;
+
+      touchLastX = t.clientX;
+      touchLastTime = now;
+    }, { passive: true });
+
+    banner.addEventListener('touchend', () => {
+      isTouching = false;
+      targetSpeed = BASE_SPEED;
+    });
 
     function lerp(a, b, t) {
       return a + (b - a) * Math.max(0, Math.min(1, t));
     }
 
-    function updateCarousel() {
-      const scrollY = window.scrollY;
-
-      // ── Phase 1: Rotation ──
-      const rotationProgress = Math.min(Math.max(scrollY / ROTATION_END, 0), 1);
-      const rotationDeg = rotationProgress * 360;
+    // ── Update icon visuals for current rotation angle ──
+    function updateIcons() {
       carousel.style.transform = `rotateY(${-rotationDeg}deg)`;
 
-      // ── Update each icon's opacity based on facing angle ──
       items.forEach((item, i) => {
         const baseAngle = i * 72;
         const effectiveAngle = ((baseAngle - rotationDeg) % 360 + 360) % 360;
@@ -548,15 +581,28 @@
         const label = item.querySelector('.icon-label');
         label.style.opacity = Math.max(0, (facing - 0.2) / 0.8);
       });
+    }
 
-      // ── Phase 2: Explore text fade-in ──
-      const exploreProgress = (scrollY - EXPLORE_START) / (EXPLORE_END - EXPLORE_START);
-      exploreText.style.opacity = Math.max(0, Math.min(1, exploreProgress));
+    // ── Animation loop ──
+    function tick(now) {
+      const dt = (now - lastTime) / 1000; // seconds
+      lastTime = now;
 
-      // ── Scroll hint fade-out ──
-      scrollHint.style.opacity = Math.max(0, 1 - scrollY / (vh * 0.5));
+      // Smoothly blend toward target speed
+      currentSpeed += (targetSpeed - currentSpeed) * Math.min(1, dt * 4);
+      rotationDeg += currentSpeed * dt;
 
-      // ── Phase 3: Banner fade-out / Quiz fade-in ──
+      updateIcons();
+      requestAnimationFrame(tick);
+    }
+
+    requestAnimationFrame(tick);
+
+    // ── Quiz slide-over (scroll-driven) ──
+    function updateQuizOverlap() {
+      // Scroll hint fades out as user starts scrolling
+      scrollHint.style.opacity = Math.max(0, 0.4 - window.scrollY / (vh * 0.3));
+
       const quizTop = quizSection.getBoundingClientRect().top;
       const overlap = Math.max(0, Math.min(1, 1 - quizTop / vh));
 
@@ -584,10 +630,9 @@
       quizPagination.style.transform = `translateY(${lerp(20, 0, pagFade)}px)`;
     }
 
-    // ── Listen ──
-    window.addEventListener('scroll', updateCarousel, { passive: true });
-    window.addEventListener('resize', () => { updateCarousel(); });
-    updateCarousel();
+    window.addEventListener('scroll', updateQuizOverlap, { passive: true });
+    window.addEventListener('resize', updateQuizOverlap);
+    updateQuizOverlap();
 
     // ── Quiz option click highlight ──
     document.querySelectorAll('.quiz-option').forEach(opt => {
