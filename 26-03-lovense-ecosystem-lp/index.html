@@ -47,14 +47,14 @@
       overflow: hidden;
     }
 
-    /* Subtle radial glow behind carousel */
+    /* Subtle radial glow */
     .banner::before {
       content: '';
       position: absolute;
-      width: 600px;
-      height: 600px;
+      width: 800px;
+      height: 800px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(255, 45, 137, 0.08) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(255, 45, 137, 0.06) 0%, transparent 70%);
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
@@ -62,10 +62,10 @@
     }
 
     .brand-title {
-      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      font-size: clamp(2rem, 4.5vw, 3.5rem);
       font-weight: 800;
-      letter-spacing: 0.15em;
-      text-indent: 0.15em;
+      letter-spacing: 0.12em;
+      text-indent: 0.12em;
       text-transform: uppercase;
       text-align: center;
       padding: 0 1rem;
@@ -73,91 +73,236 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      margin-bottom: 0.4rem;
+      margin-bottom: 0.3rem;
+      position: relative;
+      z-index: 5;
     }
 
     .brand-subtitle {
-      font-size: clamp(0.85rem, 1.8vw, 1.1rem);
+      font-size: clamp(0.8rem, 1.6vw, 1rem);
       font-weight: 300;
       color: rgba(255, 255, 255, 0.5);
-      letter-spacing: 0.08em;
-      margin-bottom: 3rem;
+      letter-spacing: 0.06em;
+      margin-bottom: 2rem;
       text-align: center;
       max-width: 500px;
       padding: 0 1rem;
-      line-height: 1.6;
+      line-height: 1.5;
+      position: relative;
+      z-index: 5;
     }
 
-    /* ─── 3D CAROUSEL ─── */
-    .carousel-wrapper {
-      perspective: 1000px;
+    /* ─── BUBBLE CONTAINER ─── */
+    .bubble-container {
+      position: relative;
       width: 100%;
-      height: 280px;
+      max-width: 900px;
+      height: 420px;
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
+      z-index: 10;
     }
 
-    .carousel {
-      width: 120px;
-      height: 120px;
-      position: relative;
-      transform-style: preserve-3d;
-      transform: rotateY(0deg);
-      transition: none;
-    }
-
-    .carousel-item {
+    /* Connection lines between bubbles */
+    .connection-line {
       position: absolute;
-      width: 120px;
-      height: 160px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 45, 137, 0.35), transparent);
+      transform-origin: left center;
+      pointer-events: none;
+      opacity: 0.6;
+      transition: opacity 0.3s ease;
+    }
+
+    .bubble-container.has-expanded .connection-line {
+      opacity: 0.2;
+    }
+
+    /* ─── BUBBLES ─── */
+    .bubble {
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 16px;
-      backface-visibility: visible;
-      transition: none;
-      color: var(--lovense-pink);
+      gap: 4px;
+      cursor: pointer;
+      transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                  height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  box-shadow 0.3s ease,
+                  border-color 0.3s ease;
+      border: 2px solid var(--lovense-pink);
+      background: rgba(8, 6, 14, 0.95);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      will-change: transform;
+      overflow: hidden;
     }
 
-    .carousel-item:nth-child(1) { transform: rotateY(0deg)    translateZ(260px); }
-    .carousel-item:nth-child(2) { transform: rotateY(72deg)   translateZ(260px); }
-    .carousel-item:nth-child(3) { transform: rotateY(144deg)  translateZ(260px); }
-    .carousel-item:nth-child(4) { transform: rotateY(216deg)  translateZ(260px); }
-    .carousel-item:nth-child(5) { transform: rotateY(288deg)  translateZ(260px); }
-
-    .icon-circle {
-      width: 90px;
-      height: 90px;
+    .bubble::before {
+      content: '';
+      position: absolute;
+      inset: 0;
       border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255, 45, 137, 0.15), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .bubble:hover::before {
+      opacity: 1;
+    }
+
+    /* Expanded bubble state - stays circular */
+    .bubble.expanded {
+      width: min(55vw, 380px);
+      height: min(55vw, 380px);
+      z-index: 100 !important;
+      cursor: default;
+      border: 2px solid rgba(255, 45, 137, 0.8);
+      box-shadow: 0 0 60px rgba(255, 45, 137, 0.35), inset 0 0 60px rgba(0,0,0,0.3);
+    }
+
+    .bubble.expanded::before {
+      display: none;
+    }
+
+    /* Background image with vignette/blur */
+    .bubble-bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      border-radius: 50%;
+    }
+
+    .bubble.expanded .bubble-bg {
+      opacity: 1;
+    }
+
+    /* Vignette overlay - circular */
+    .bubble-vignette {
+      position: absolute;
+      inset: 0;
+      background: 
+        radial-gradient(circle at center, transparent 30%, rgba(8, 6, 14, 0.6) 60%, rgba(8, 6, 14, 0.95) 100%),
+        radial-gradient(circle at 30% 20%, rgba(255, 45, 137, 0.1) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      border-radius: 50%;
+    }
+
+    .bubble.expanded .bubble-vignette {
+      opacity: 1;
+    }
+
+    /* Blur overlay at edges - circular mask */
+    .bubble-blur {
+      position: absolute;
+      inset: 0;
+      backdrop-filter: blur(0px);
+      -webkit-backdrop-filter: blur(0px);
+      mask: radial-gradient(circle at center, transparent 50%, black 100%);
+      -webkit-mask: radial-gradient(circle at center, transparent 50%, black 100%);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      border-radius: 50%;
+    }
+
+    .bubble.expanded .bubble-blur {
+      opacity: 1;
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+    }
+
+    /* Icon container */
+    .bubble-icon {
+      width: 36px;
+      height: 36px;
       display: flex;
       align-items: center;
       justify-content: center;
-      border: 2px solid var(--lovense-pink);
+      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
       position: relative;
-      transition: box-shadow 0.3s ease;
+      z-index: 2;
     }
 
-    .icon-circle svg {
-      width: 40px;
-      height: 40px;
+    .bubble-icon svg {
+      width: 24px;
+      height: 24px;
       stroke: var(--lovense-pink);
       fill: none;
       stroke-width: 1.5;
       stroke-linecap: round;
       stroke-linejoin: round;
+      transition: all 0.4s ease;
     }
 
-    .icon-label {
-      font-size: 0.8rem;
+    .bubble.expanded .bubble-icon {
+      width: 60px;
+      height: 60px;
+      margin-bottom: 0.5rem;
+    }
+
+    .bubble.expanded .bubble-icon svg {
+      width: 40px;
+      height: 40px;
+      stroke: #fff;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+    }
+
+    /* Label */
+    .bubble-label {
+      font-size: 0.65rem;
       font-weight: 600;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
       text-align: center;
-      white-space: nowrap;
       color: var(--lovense-pink);
+      transition: all 0.4s ease;
+      position: relative;
+      z-index: 2;
+    }
+
+    .bubble.expanded .bubble-label {
+      font-size: 1.3rem;
+      color: #fff;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+      letter-spacing: 0.06em;
+    }
+
+    /* Description (hidden by default) */
+    .bubble-description {
+      position: absolute;
+      bottom: 20%;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      width: 70%;
+      text-align: center;
+      font-size: 0.95rem;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.95);
+      line-height: 1.5;
+      opacity: 0;
+      transition: all 0.5s ease 0.1s;
+      z-index: 2;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+    }
+
+    .bubble.expanded .bubble-description {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Non-expanded bubbles dim when one is expanded */
+    .bubble-container.has-expanded .bubble:not(.expanded) {
+      opacity: 0.3;
     }
 
     /* ─── EXPLORE TEXT ─── */
@@ -166,14 +311,19 @@
       bottom: 12%;
       left: 50%;
       transform: translateX(-50%);
-      font-size: clamp(1rem, 2.2vw, 1.4rem);
-      font-weight: 700;
+      font-size: clamp(0.95rem, 2vw, 1.3rem);
+      font-weight: 600;
       color: var(--lovense-pink);
       text-align: center;
       opacity: 1;
       letter-spacing: 0.04em;
       max-width: 480px;
       padding: 0 1rem;
+      transition: opacity 0.4s ease;
+    }
+
+    .bubble-container.has-expanded ~ .explore-text {
+      opacity: 0;
     }
 
     .scroll-hint {
@@ -210,13 +360,11 @@
       50% { transform: rotate(45deg) translateY(6px); }
     }
 
-
-
     /* ─── QUIZ SECTION (slides over banner) ─── */
     .quiz-section {
       position: relative;
       z-index: 10;
-      margin-top: 100vh; /* push below the fixed banner */
+      margin-top: 100vh;
       background: linear-gradient(180deg, #FFDCDF 0%, #FFF9F5 100%);
       min-height: 100vh;
       display: flex;
@@ -275,7 +423,6 @@
       max-width: 560px;
     }
 
-    /* Quiz card */
     .quiz-card {
       background: #fff;
       border: 1px solid rgba(0, 0, 0, 0.06);
@@ -319,7 +466,6 @@
       box-shadow: 0 2px 12px rgba(255, 45, 137, 0.1);
     }
 
-    /* ─── PAGINATION DOTS ─── */
     .quiz-pagination {
       display: flex;
       gap: 8px;
@@ -356,21 +502,79 @@
     }
 
     /* ─── RESPONSIVE ─── */
-    @media (max-width: 600px) {
-      .carousel-wrapper {
-        height: 220px;
+    @media (max-width: 768px) {
+      .bubble-container {
+        height: 350px;
       }
-      .carousel-item { width: 90px; height: 130px; }
-      .carousel-item:nth-child(1) { transform: rotateY(0deg)    translateZ(180px); }
-      .carousel-item:nth-child(2) { transform: rotateY(72deg)   translateZ(180px); }
-      .carousel-item:nth-child(3) { transform: rotateY(144deg)  translateZ(180px); }
-      .carousel-item:nth-child(4) { transform: rotateY(216deg)  translateZ(180px); }
-      .carousel-item:nth-child(5) { transform: rotateY(288deg)  translateZ(180px); }
-      .icon-circle { width: 65px; height: 65px; }
-      .icon-circle svg { width: 28px; height: 28px; }
-      .icon-label { font-size: 0.65rem; }
+      
+      .bubble {
+        width: 85px;
+        height: 85px;
+      }
+
+      .bubble-icon {
+        width: 32px;
+        height: 32px;
+      }
+
+      .bubble-icon svg {
+        width: 22px;
+        height: 22px;
+      }
+
+      .bubble-label {
+        font-size: 0.6rem;
+      }
+
+      .bubble.expanded {
+        width: 75vw;
+        height: 75vw;
+        max-width: 340px;
+        max-height: 340px;
+      }
+
+      .bubble.expanded .bubble-icon {
+        width: 55px;
+        height: 55px;
+      }
+
+      .bubble.expanded .bubble-icon svg {
+        width: 36px;
+        height: 36px;
+      }
+
+      .bubble.expanded .bubble-label {
+        font-size: 1.15rem;
+      }
+
+      .bubble-description {
+        font-size: 0.88rem;
+        width: 75%;
+      }
+
       .quiz-card { padding: 2rem 1.5rem; }
       .quiz-menu-bar { padding: 1.2rem 1rem; }
+    }
+
+    @media (max-width: 480px) {
+      .bubble {
+        width: 75px;
+        height: 75px;
+      }
+
+      .bubble-icon {
+        width: 28px;
+        height: 28px;
+      }
+
+      .bubble-icon svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      .bubble-label {
+        font-size: 0.55rem;
+      }
     }
   </style>
 </head>
@@ -381,74 +585,74 @@
     <h1 class="brand-title">Toys Are Just the Beginning</h1>
     <p class="brand-subtitle">One connected ecosystem. <br> Endless ways to feel closer.</p>
 
-    <div class="carousel-wrapper">
-      <div class="carousel" id="carousel">
-
-        <!-- 1 · Toys -->
-        <div class="carousel-item" data-icon="toys">
-          <div class="icon-circle">
-            <svg viewBox="0 0 24 24">
-              <path d="M12 2l2.4 4.8 5.3.8-3.8 3.7.9 5.3L12 14.2l-4.8 2.4.9-5.3L4.3 7.6l5.3-.8z"/>
-            </svg>
-          </div>
-          <span class="icon-label">Toys</span>
+    <div class="bubble-container" id="bubbleContainer">
+      <!-- Connection lines will be generated by JS -->
+      
+      <!-- 1 · Toys -->
+      <div class="bubble" data-index="0" data-label="Toys">
+        <div class="bubble-bg" style="background-image: url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80')"></div>
+        <div class="bubble-vignette"></div>
+        <div class="bubble-blur"></div>
+        <div class="bubble-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2l2.4 4.8 5.3.8-3.8 3.7.9 5.3L12 14.2l-4.8 2.4.9-5.3L4.3 7.6l5.3-.8z"/>
+          </svg>
         </div>
+        <span class="bubble-label">Toys</span>
+        <p class="bubble-description">Premium pleasure devices engineered for connection, with app-controlled features that bring partners together.</p>
+      </div>
 
-        <!-- 2 · Remote -->
-        <div class="carousel-item" data-icon="remote">
-          <div class="icon-circle">
-            <svg viewBox="0 0 24 24">
-              <path d="M12 20h.01"/>
-              <path d="M8.5 16.5a5 5 0 0 1 7 0"/>
-              <path d="M5 13a10 10 0 0 1 14 0"/>
-              <path d="M1.5 9.5a15 15 0 0 1 21 0"/>
-            </svg>
-          </div>
-          <span class="icon-label">Remote</span>
+      <!-- 2 · Remote App -->
+      <div class="bubble" data-index="1" data-label="Remote App">
+        <div class="bubble-bg" style="background-image: url('https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&q=80')"></div>
+        <div class="bubble-vignette"></div>
+        <div class="bubble-blur"></div>
+        <div class="bubble-icon">
+          <svg viewBox="0 0 24 24">
+            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+            <line x1="12" y1="18" x2="12.01" y2="18"/>
+            <path d="M8 6h8"/>
+            <path d="M8 10h8"/>
+          </svg>
         </div>
+        <span class="bubble-label">Remote App</span>
+        <p class="bubble-description">Control any Lovense toy from anywhere in the world with our intuitive mobile app.</p>
+      </div>
 
-        <!-- 3 · Interactive -->
-        <div class="carousel-item" data-icon="interactive">
-          <div class="icon-circle">
-            <svg viewBox="0 0 24 24">
-              <path d="M15 7.5V2H9v5.5"/>
-              <path d="M9 12.5V20a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-7.5"/>
-              <circle cx="12" cy="10" r="3"/>
-              <path d="M6 10a6 6 0 0 1 12 0"/>
-            </svg>
-          </div>
-          <span class="icon-label">Interactive</span>
+      <!-- 3 · Integrations -->
+      <div class="bubble" data-index="2" data-label="Integrations">
+        <div class="bubble-bg" style="background-image: url('https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&q=80')"></div>
+        <div class="bubble-vignette"></div>
+        <div class="bubble-blur"></div>
+        <div class="bubble-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.8 1.7"/>
+            <path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.8-1.7"/>
+          </svg>
         </div>
+        <span class="bubble-label">Integrations</span>
+        <p class="bubble-description">Sync with games, videos, and cam platforms for immersive interactive experiences.</p>
+      </div>
 
-        <!-- 4 · Connection -->
-        <div class="carousel-item" data-icon="connection">
-          <div class="icon-circle">
-            <svg viewBox="0 0 24 24">
-              <path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.8 1.7"/>
-              <path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.8-1.7"/>
-            </svg>
-          </div>
-          <span class="icon-label">Connection</span>
+      <!-- 4 · Community -->
+      <div class="bubble" data-index="3" data-label="Community">
+        <div class="bubble-bg" style="background-image: url('https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80')"></div>
+        <div class="bubble-vignette"></div>
+        <div class="bubble-blur"></div>
+        <div class="bubble-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
         </div>
-
-        <!-- 5 · Extension -->
-        <div class="carousel-item" data-icon="extension">
-          <div class="icon-circle">
-            <svg viewBox="0 0 24 24">
-              <path d="M13.5 2H16a2 2 0 0 1 2 2v2.5"/>
-              <path d="M20 13.5V16a2 2 0 0 1-2 2h-2.5"/>
-              <path d="M10.5 22H8a2 2 0 0 1-2-2v-2.5"/>
-              <path d="M4 10.5V8a2 2 0 0 1 2-2h2.5"/>
-              <circle cx="12" cy="12" r="2"/>
-            </svg>
-          </div>
-          <span class="icon-label">Extension</span>
-        </div>
-
+        <span class="bubble-label">Community</span>
+        <p class="bubble-description">Join millions of users worldwide sharing patterns, tips, and intimate moments together.</p>
       </div>
     </div>
 
-    <p class="explore-text" id="exploreText">Explore what the system can unlock for you</p>
+    <p class="explore-text" id="exploreText">Hover a bubble to explore the ecosystem</p>
 
     <div class="scroll-hint" id="scrollHint">
       <span>Scroll</span>
@@ -456,7 +660,7 @@
     </div>
   </section>
 
-  <!-- ═══ QUIZ SECTION (slides over the banner) ═══ -->
+  <!-- ═══ QUIZ SECTION ═══ -->
   <section class="quiz-section" id="quizSection">
     <div class="quiz-menu-bar" id="quizMenuBar">
       <h2>Everything Starts when You Choose a Toy</h2>
@@ -482,8 +686,8 @@
   </section>
 
   <script>
-    const carousel = document.getElementById('carousel');
-    const items = document.querySelectorAll('.carousel-item');
+    const bubbleContainer = document.getElementById('bubbleContainer');
+    const bubbles = document.querySelectorAll('.bubble');
     const scrollHint = document.getElementById('scrollHint');
     const banner = document.getElementById('banner');
     const quizSection = document.getElementById('quizSection');
@@ -492,132 +696,347 @@
     const quizPagination = document.getElementById('quizPagination');
     const vh = window.innerHeight;
 
-    // ── Auto-rotation state ──
-    const BASE_SPEED = 12;           // degrees per second (idle)
-    const HOVER_SPEED = 60;          // degrees per second (hover)
-    let rotationDeg = 0;
-    let currentSpeed = BASE_SPEED;   // positive = clockwise
-    let targetSpeed = BASE_SPEED;
-    let lastTime = performance.now();
+    // Detect touch device
+    const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
+    
+    // Update explore text based on device
+    const exploreText = document.getElementById('exploreText');
+    if (isTouchDevice) {
+      exploreText.textContent = 'Tap a bubble to explore the ecosystem';
+    }
 
-    // ── Hover: left half → faster left, right half → faster right ──
-    banner.addEventListener('mousemove', (e) => {
-      const rect = banner.getBoundingClientRect();
-      const xRatio = (e.clientX - rect.left) / rect.width; // 0–1
-      if (xRatio < 0.5) {
-        targetSpeed = -HOVER_SPEED;   // counter-clockwise
+    // ── Bubble Physics State ──
+    const bubbleStates = [];
+    const NUM_BUBBLES = 4;
+    const BUBBLE_SIZE = 100;
+    const EXPANDED_SIZE = Math.min(window.innerWidth * 0.55, 380);
+    
+    // Home centers with overlapping orbital radii
+    const homeCenters = [
+      { x: -70, y: -50, radius: 55, speed: 0.4, phase: 0 },           // Toys
+      { x: 70, y: -55, radius: 50, speed: -0.35, phase: Math.PI/2 },  // Remote
+      { x: -65, y: 60, radius: 52, speed: 0.3, phase: Math.PI },      // Integrations
+      { x: 75, y: 55, radius: 58, speed: -0.45, phase: Math.PI*1.5 }  // Community
+    ];
+
+    bubbles.forEach((bubble, i) => {
+      const home = homeCenters[i];
+      bubbleStates.push({
+        x: home.x + Math.cos(home.phase) * home.radius,
+        y: home.y + Math.sin(home.phase) * home.radius,
+        z: (Math.random() - 0.5) * 20,
+        vx: 0,
+        vy: 0,
+        vz: 0,
+        home: home,
+        angle: home.phase
+      });
+    });
+
+    // Create connection lines
+    function createConnectionLines() {
+      const connections = [
+        [0, 1], [0, 2], [0, 3],
+        [1, 2], [1, 3],
+        [2, 3]
+      ];
+      
+      connections.forEach(([i, j]) => {
+        const line = document.createElement('div');
+        line.className = 'connection-line';
+        line.dataset.from = i;
+        line.dataset.to = j;
+        bubbleContainer.insertBefore(line, bubbleContainer.firstChild);
+      });
+    }
+    createConnectionLines();
+
+    // Keep bubbles separated
+    function separateBubbles() {
+      const minDist = BUBBLE_SIZE + 30;
+      
+      for (let i = 0; i < NUM_BUBBLES; i++) {
+        for (let j = i + 1; j < NUM_BUBBLES; j++) {
+          const s1 = bubbleStates[i];
+          const s2 = bubbleStates[j];
+          
+          const dx = s2.x - s1.x;
+          const dy = s2.y - s1.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          
+          if (dist < minDist && dist > 0) {
+            const force = (minDist - dist) / dist * 0.3;
+            const fx = dx * force;
+            const fy = dy * force;
+            
+            s1.vx -= fx;
+            s1.vy -= fy;
+            s2.vx += fx;
+            s2.vy += fy;
+          }
+        }
+      }
+    }
+
+    // Push bubbles away from expanded one
+    function pushFromExpanded(expandedIdx) {
+      const expanded = bubbleStates[expandedIdx];
+      const expandedRadius = EXPANDED_SIZE / 2;
+      
+      bubbleStates.forEach((state, i) => {
+        if (i === expandedIdx) return;
+        
+        const bubbleRadius = BUBBLE_SIZE / 2;
+        const minDist = expandedRadius + bubbleRadius + 40;
+        
+        const dx = state.x - expanded.x;
+        const dy = state.y - expanded.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        
+        if (dist < minDist && dist > 0) {
+          const push = (minDist - dist) / dist;
+          state.x += dx * push * 1.5;
+          state.y += dy * push * 1.5;
+          state.vx += (dx / dist) * 3;
+          state.vy += (dy / dist) * 3;
+        }
+      });
+    }
+
+    // ── Animation Loop ──
+    let animationId;
+    let time = 0;
+    let expandedBubble = null;
+    let expandedBubbleLockPos = null;
+    let wasExpanded = false;
+
+    function updateBubbles() {
+      const containerRect = bubbleContainer.getBoundingClientRect();
+      const centerX = containerRect.width / 2;
+      const centerY = containerRect.height / 2;
+      const maxRadiusX = containerRect.width * 0.4;
+      const maxRadiusY = containerRect.height * 0.4;
+
+      time += 0.016;
+
+      // Check if we just came out of expansion
+      const justCollapsed = wasExpanded && !expandedBubble;
+      wasExpanded = !!expandedBubble;
+
+      bubbleStates.forEach((state, i) => {
+        // If this bubble is expanded, freeze it at locked position
+        if (expandedBubble && expandedBubble.dataset.index == i) {
+          if (expandedBubbleLockPos) {
+            state.x = expandedBubbleLockPos.x;
+            state.y = expandedBubbleLockPos.y;
+            state.z = 0;
+            bubbles[i].style.transform = `translate(${state.x}px, ${state.y}px) scale(1)`;
+          }
+          bubbles[i].style.zIndex = 100;
+          return;
+        }
+
+        // Orbital motion around home center
+        state.angle += state.home.speed * 0.016;
+        
+        // Target position on orbit
+        const targetX = state.home.x + Math.cos(state.angle) * state.home.radius;
+        const targetY = state.home.y + Math.sin(state.angle) * state.home.radius;
+        
+        // Smooth movement toward orbital position
+        state.vx += (targetX - state.x) * 0.08;
+        state.vy += (targetY - state.y) * 0.08;
+        
+        // Z-depth breathing
+        const targetZ = Math.sin(time * 0.5 + state.home.phase) * 25;
+        state.vz += (targetZ - state.z) * 0.02;
+
+        // High friction for smooth, sliding motion
+        const friction = 0.94;
+        state.vx *= friction;
+        state.vy *= friction;
+        state.vz *= friction;
+
+        // Speed limit
+        const maxSpeed = 2;
+        const speed = Math.sqrt(state.vx * state.vx + state.vy * state.vy);
+        if (speed > maxSpeed) {
+          state.vx = (state.vx / speed) * maxSpeed;
+          state.vy = (state.vy / speed) * maxSpeed;
+        }
+
+        // Update position
+        state.x += state.vx;
+        state.y += state.vy;
+        state.z += state.vz;
+
+        // Soft boundary - gentle push back
+        const margin = 50;
+        if (state.x < -maxRadiusX + margin) state.vx += 0.05;
+        if (state.x > maxRadiusX - margin) state.vx -= 0.05;
+        if (state.y < -maxRadiusY + margin) state.vy += 0.05;
+        if (state.y > maxRadiusY - margin) state.vy -= 0.05;
+
+        // Keep in bounds (hard limit)
+        state.x = Math.max(-maxRadiusX, Math.min(maxRadiusX, state.x));
+        state.y = Math.max(-maxRadiusY, Math.min(maxRadiusY, state.y));
+        state.z = Math.max(-30, Math.min(30, state.z));
+
+        // If just collapsed, add extra friction for smooth return
+        if (justCollapsed) {
+          state.vx *= 0.7;
+          state.vy *= 0.7;
+        }
+
+        // Calculate scale based on z (0.9 to 1.1)
+        const scale = 0.95 + (state.z + 30) / 60 * 0.1;
+
+        // Apply transform
+        bubbles[i].style.transform = `translate(${state.x}px, ${state.y}px) scale(${scale})`;
+        bubbles[i].style.zIndex = Math.round(state.z + 50);
+      });
+
+      // Keep bubbles separated
+      separateBubbles();
+
+      // Push from expanded
+      if (expandedBubble) {
+        pushFromExpanded(parseInt(expandedBubble.dataset.index));
+      }
+
+      updateConnectionLines();
+      animationId = requestAnimationFrame(updateBubbles);
+    }
+
+    function updateConnectionLines() {
+      const lines = document.querySelectorAll('.connection-line');
+      const containerRect = bubbleContainer.getBoundingClientRect();
+      const centerX = containerRect.width / 2;
+      const centerY = containerRect.height / 2;
+
+      lines.forEach(line => {
+        const from = parseInt(line.dataset.from);
+        const to = parseInt(line.dataset.to);
+        const s1 = bubbleStates[from];
+        const s2 = bubbleStates[to];
+        
+        const x1 = centerX + s1.x;
+        const y1 = centerY + s1.y;
+        const x2 = centerX + s2.x;
+        const y2 = centerY + s2.y;
+
+        const length = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+        const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+
+        line.style.width = `${length}px`;
+        line.style.left = `${x1}px`;
+        line.style.top = `${y1}px`;
+        line.style.transform = `rotate(${angle}deg)`;
+      });
+    }
+
+    // Start animation
+    updateBubbles();
+
+    // ── Expand/Collapse ──
+    function expandBubble(bubble) {
+      if (expandedBubble === bubble) return;
+      
+      if (expandedBubble) {
+        expandedBubble.classList.remove('expanded');
+      }
+
+      expandedBubble = bubble;
+      bubble.classList.add('expanded');
+      bubbleContainer.classList.add('has-expanded');
+      
+      const idx = parseInt(bubble.dataset.index);
+      const state = bubbleStates[idx];
+      
+      // Lock position at current position
+      expandedBubbleLockPos = {
+        x: state.x,
+        y: state.y
+      };
+      
+      // Set immediately
+      state.x = expandedBubbleLockPos.x;
+      state.y = expandedBubbleLockPos.y;
+      state.z = 0;
+      bubble.style.transform = `translate(${state.x}px, ${state.y}px) scale(1)`;
+      
+      // Push others immediately
+      pushFromExpanded(idx);
+    }
+
+    function collapseBubble() {
+      if (!expandedBubble) return;
+      
+      expandedBubble.classList.remove('expanded');
+      bubbleContainer.classList.remove('has-expanded');
+      expandedBubble = null;
+      expandedBubbleLockPos = null;
+    }
+
+    // ── Event Handlers ──
+    bubbles.forEach(bubble => {
+      if (isTouchDevice) {
+        bubble.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (expandedBubble === bubble) {
+            collapseBubble();
+          } else {
+            expandBubble(bubble);
+          }
+        });
       } else {
-        targetSpeed = HOVER_SPEED;    // clockwise
+        bubble.addEventListener('mouseenter', () => {
+          expandBubble(bubble);
+        });
+        
+        bubble.addEventListener('mouseleave', (e) => {
+          const relatedTarget = e.relatedTarget;
+          if (!relatedTarget || !relatedTarget.closest('.bubble')) {
+            collapseBubble();
+          }
+        });
+        
+        bubble.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (expandedBubble === bubble) {
+            collapseBubble();
+          } else {
+            expandBubble(bubble);
+          }
+        });
       }
     });
 
-    banner.addEventListener('mouseleave', () => {
-      targetSpeed = BASE_SPEED;
+    document.addEventListener('click', (e) => {
+      if (expandedBubble && !e.target.closest('.bubble')) {
+        collapseBubble();
+      }
     });
 
-    // ── Touch: swipe to spin ──
-    let touchStartX = 0;
-    let touchLastX = 0;
-    let touchLastTime = 0;
-    let isTouching = false;
-
-    banner.addEventListener('touchstart', (e) => {
-      const t = e.touches[0];
-      touchStartX = t.clientX;
-      touchLastX = t.clientX;
-      touchLastTime = performance.now();
-      isTouching = true;
-    }, { passive: true });
-
-    banner.addEventListener('touchmove', (e) => {
-      if (!isTouching) return;
-      const t = e.touches[0];
-      const now = performance.now();
-      const dx = t.clientX - touchLastX;
-      const dt = Math.max(1, now - touchLastTime) / 1000;
-
-      // Convert px/s to degrees/s (scale factor tunes sensitivity)
-      const swipeSpeed = -(dx / dt) * 0.3;
-      targetSpeed = swipeSpeed;
-
-      touchLastX = t.clientX;
-      touchLastTime = now;
-    }, { passive: true });
-
-    banner.addEventListener('touchend', () => {
-      isTouching = false;
-      targetSpeed = BASE_SPEED;
-    });
-
+    // ── Quiz slide-over ──
     function lerp(a, b, t) {
       return a + (b - a) * Math.max(0, Math.min(1, t));
     }
 
-    // ── Update icon visuals for current rotation angle ──
-    function updateIcons() {
-      carousel.style.transform = `rotateY(${-rotationDeg}deg)`;
-
-      items.forEach((item, i) => {
-        const baseAngle = i * 72;
-        const effectiveAngle = ((baseAngle - rotationDeg) % 360 + 360) % 360;
-        const radians = effectiveAngle * Math.PI / 180;
-        const facing = Math.cos(radians);
-
-        const opacity = Math.max(0.08, (facing + 1) / 2);
-        item.style.opacity = opacity;
-
-        // Subtle glow on front-facing icon
-        const circle = item.querySelector('.icon-circle');
-        const glowStrength = Math.max(0, facing);
-
-        if (glowStrength > 0.3) {
-          const blur1 = Math.round(6 + glowStrength * 14);
-          const blur2 = Math.round(10 + glowStrength * 25);
-          circle.style.boxShadow = `0 0 ${blur1}px rgba(255,45,137,${glowStrength * 0.3}), 0 0 ${blur2}px rgba(255,45,137,${glowStrength * 0.15})`;
-        } else {
-          circle.style.boxShadow = 'none';
-        }
-
-        const label = item.querySelector('.icon-label');
-        label.style.opacity = Math.max(0, (facing - 0.2) / 0.8);
-      });
-    }
-
-    // ── Animation loop ──
-    function tick(now) {
-      const dt = (now - lastTime) / 1000; // seconds
-      lastTime = now;
-
-      // Smoothly blend toward target speed
-      currentSpeed += (targetSpeed - currentSpeed) * Math.min(1, dt * 4);
-      rotationDeg += currentSpeed * dt;
-
-      updateIcons();
-      requestAnimationFrame(tick);
-    }
-
-    requestAnimationFrame(tick);
-
-    // ── Quiz slide-over (scroll-driven) ──
     function updateQuizOverlap() {
-      // Scroll hint fades out as user starts scrolling
       scrollHint.style.opacity = Math.max(0, 0.4 - window.scrollY / (vh * 0.3));
 
       const quizTop = quizSection.getBoundingClientRect().top;
       const overlap = Math.max(0, Math.min(1, 1 - quizTop / vh));
 
-      // Banner fades out fast (gone by halfway)
       banner.style.opacity = Math.max(0, 1 - overlap * 2);
 
-      // Delayed fade: invisible for first 15%, fully opaque by 75%
       function fade(t) { return Math.max(0, Math.min(1, (t - 0.15) / 0.6)); }
 
-      // Menu bar (title/description) fades in with the section
       const menuFade = fade(overlap);
       quizMenuBar.style.opacity = menuFade;
       quizMenuBar.style.transform = `translateY(${lerp(20, 0, menuFade)}px)`;
 
-      // Quiz card fades in based on its own position in viewport
       const cardRect = quizCard.getBoundingClientRect();
       const cardRaw = Math.max(0, Math.min(1, 1 - cardRect.top / vh));
       const cardFade = fade(cardRaw);
@@ -634,7 +1053,7 @@
     window.addEventListener('resize', updateQuizOverlap);
     updateQuizOverlap();
 
-    // ── Quiz option click highlight ──
+    // ── Quiz interactions ──
     document.querySelectorAll('.quiz-option').forEach(opt => {
       opt.addEventListener('click', () => {
         document.querySelectorAll('.quiz-option').forEach(o => {
@@ -646,7 +1065,6 @@
       });
     });
 
-    // ── Page dot click ──
     document.querySelectorAll('.page-dot').forEach(dot => {
       dot.addEventListener('click', () => {
         document.querySelectorAll('.page-dot').forEach(d => d.classList.remove('active'));
