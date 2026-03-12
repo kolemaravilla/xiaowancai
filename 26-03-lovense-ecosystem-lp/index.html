@@ -234,12 +234,14 @@
       z-index: 2;
     }
 
-    .bubble-icon img {
-      width: 28px;
-      height: 28px;
-      object-fit: contain;
-      /* Pink neon effect: convert black to pink with glow */
-      filter: brightness(0) saturate(100%) invert(35%) sepia(80%) saturate(5000%) hue-rotate(310deg) brightness(1.1) drop-shadow(0 0 3px #FF2D89) drop-shadow(0 0 6px #FF2D89);
+    .bubble-icon svg {
+      width: 24px;
+      height: 24px;
+      stroke: var(--lovense-pink);
+      fill: none;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
       transition: all 0.4s ease;
     }
 
@@ -249,11 +251,11 @@
       margin-bottom: 0.5rem;
     }
 
-    .bubble.expanded .bubble-icon img {
-      width: 48px;
-      height: 48px;
-      /* Brighter pink neon when expanded */
-      filter: brightness(0) saturate(100%) invert(35%) sepia(80%) saturate(5000%) hue-rotate(310deg) brightness(1.3) drop-shadow(0 0 5px #FF2D89) drop-shadow(0 0 10px #FF2D89) drop-shadow(0 0 20px #FF2D89);
+    .bubble.expanded .bubble-icon svg {
+      width: 40px;
+      height: 40px;
+      stroke: #fff;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
     }
 
     /* Label */
@@ -516,9 +518,9 @@
         height: 32px;
       }
 
-      .bubble-icon img {
-        width: 26px;
-        height: 26px;
+      .bubble-icon svg {
+        width: 22px;
+        height: 22px;
       }
 
       .bubble-label {
@@ -537,9 +539,9 @@
         height: 55px;
       }
 
-      .bubble.expanded .bubble-icon img {
-        width: 42px;
-        height: 42px;
+      .bubble.expanded .bubble-icon svg {
+        width: 36px;
+        height: 36px;
       }
 
       .bubble.expanded .bubble-label {
@@ -566,9 +568,9 @@
         height: 28px;
       }
 
-      .bubble-icon img {
-        width: 24px;
-        height: 24px;
+      .bubble-icon svg {
+        width: 20px;
+        height: 20px;
       }
 
       .bubble-label {
@@ -593,7 +595,9 @@
         <div class="bubble-vignette"></div>
         <div class="bubble-blur"></div>
         <div class="bubble-icon">
-          <img src="Toys.png" alt="Toys">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2l2.4 4.8 5.3.8-3.8 3.7.9 5.3L12 14.2l-4.8 2.4.9-5.3L4.3 7.6l5.3-.8z"/>
+          </svg>
         </div>
         <span class="bubble-label">Toys</span>
         <p class="bubble-description">Premium pleasure devices engineered for connection, with app-controlled features that bring partners together.</p>
@@ -605,7 +609,12 @@
         <div class="bubble-vignette"></div>
         <div class="bubble-blur"></div>
         <div class="bubble-icon">
-          <img src="Remote.png" alt="Remote App">
+          <svg viewBox="0 0 24 24">
+            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+            <line x1="12" y1="18" x2="12.01" y2="18"/>
+            <path d="M8 6h8"/>
+            <path d="M8 10h8"/>
+          </svg>
         </div>
         <span class="bubble-label">Remote App</span>
         <p class="bubble-description">Control any Lovense toy from anywhere in the world with our intuitive mobile app.</p>
@@ -617,7 +626,10 @@
         <div class="bubble-vignette"></div>
         <div class="bubble-blur"></div>
         <div class="bubble-icon">
-          <img src="Integrations.png" alt="Integrations">
+          <svg viewBox="0 0 24 24">
+            <path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.8 1.7"/>
+            <path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.8-1.7"/>
+          </svg>
         </div>
         <span class="bubble-label">Integrations</span>
         <p class="bubble-description">Sync with games, videos, and cam platforms for immersive interactive experiences.</p>
@@ -629,7 +641,12 @@
         <div class="bubble-vignette"></div>
         <div class="bubble-blur"></div>
         <div class="bubble-icon">
-          <img src="Community.png" alt="Community">
+          <svg viewBox="0 0 24 24">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
         </div>
         <span class="bubble-label">Community</span>
         <p class="bubble-description">Join millions of users worldwide sharing patterns, tips, and intimate moments together.</p>
